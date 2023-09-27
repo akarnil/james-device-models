@@ -65,8 +65,8 @@ class ConnectedDevice(GenericDevice):
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
         self.company_id = company_id
-        self.Env = environment
-        self.S_id = sdk_id
+        self.environment = environment
+        self.sdk_id = sdk_id
         self.SdkClient = None
         self.SdkOptions = sdk_options
 
@@ -76,7 +76,7 @@ class ConnectedDevice(GenericDevice):
             # def __init__(self, uniqueId, sId, sdkOptions=None, initCallback=None)
             self.SdkClient = IoTConnectSDK(
                 self.unique_id,
-                self.company_id,
+                self.sdk_id,
                 self.SdkOptions,
                 self.device_cb
             )
@@ -88,7 +88,7 @@ class ConnectedDevice(GenericDevice):
                 self.device_cb,
                 self.twin_update_cb,
                 self.SdkOptions,
-                self.Env
+                self.environment
             )
 
     def device_cb(self, msg, status=None):
