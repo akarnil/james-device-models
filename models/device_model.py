@@ -41,6 +41,7 @@ class GenericDevice:
         }]
         return data_obj
     
+        
     def generate_d2c_data(self, data):
         data_obj = [{
             "uniqueId": self.unique_id,
@@ -59,6 +60,8 @@ class ConnectedDevice(GenericDevice):
     CMD_TYPE_FIRMWARE = '0x02'
     CMD_TYPE_CONNECTION = '0x16'
 
+    api_ver = 1.0
+
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
         self.company_id = company_id
@@ -68,16 +71,30 @@ class ConnectedDevice(GenericDevice):
         self.SdkOptions = sdk_options
 
     def connect(self):
-        self.SdkClient = IoTConnectSDK(
-            self.unique_id,
-            self.S_id,
-            self.SdkOptions,
-            self.twin_update_cb
-        )
+        print("message version {}".format(self.api_ver))
+        if self.api_ver == 2.1:
+            # def __init__(self, uniqueId, sId, sdkOptions=None, initCallback=None)
+            self.SdkClient = IoTConnectSDK(
+                self.unique_id,
+                self.company_id,
+                self.SdkOptions,
+                self.device_cb
+            )
+        else:
+            # def __init__(self, cpId, uniqueId, listner, listner_twin, sdkOptions=None, env="PROD")
+            self.SdkClient = IoTConnectSDK(
+                self.company_id,
+                self.unique_id,
+                self.device_cb,
+                self.twin_update_cb,
+                self.SdkOptions,
+                self.Env
+            )
 
     def device_cb(self, msg, status=None):
         if status is None:
             print("device callback")
+            print(json.dumps(msg, indent=2))
             if msg["cmdType"] == self.CMD_TYPE_DEVICE:
                 print("device command cmdType")
             elif msg["cmdType"] == self.CMD_TYPE_FIRMWARE:
