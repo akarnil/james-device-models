@@ -1,13 +1,13 @@
 import requests
 
-from models.device_model import *
+from models.device_model import ConnectedDevice
 
 import sys
 sys.path.append("iotconnect")
 from iotconnect import IoTConnectSDK as SdkClient
 
 class otaDemoDevice(ConnectedDevice):
-
+    api_ver = 2.1
     needs_exit:bool = False
 
     template = "wkjb220907"
@@ -42,13 +42,13 @@ class otaDemoDevice(ConnectedDevice):
         }
         return data_array
 
-    def device_cb(self, msg, status=None):
-        print("device callback")
-        if msg["cmdType"] == self.CMD_TYPE_DEVICE:
-            status = self.device_command(msg)
-        elif msg["cmdType"] == self.CMD_TYPE_FIRMWARE:
-            status = self.firmware_command(msg)
-        super().device_cb(msg, status)
+    # def device_cb(self, msg, status=None):
+    #     print("device callback")
+    #     if msg["cmdType"] == self.CMD_TYPE_DEVICE:
+    #         status = self.device_command(msg)
+    #     elif msg["cmdType"] == self.CMD_TYPE_FIRMWARE:
+    #         status = self.firmware_command(msg)
+    #     super().device_cb(msg, status)
 
     def device_command(self, msg):
         command = msg['command'].split(' ')
