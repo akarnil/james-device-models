@@ -102,15 +102,19 @@ class demo_edge_device(ConnectedDevice):
             try:
                 self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
                 self.needs_exit = True
+                self.ota_delete_primary_backup()
+                self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
+                return
+            
             except:
                 self.ota_restore_primary()
                 self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED to install")
                 self.needs_exit = False
-
-            if self.needs_exit:
-                self.ota_delete_primary_backup()
-                self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
-                return
+                raise
+            # if self.needs_exit:
+            #     self.ota_delete_primary_backup()
+            #     self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
+            #     return
             
         self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
 
