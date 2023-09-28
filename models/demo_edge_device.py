@@ -64,7 +64,7 @@ class demo_edge_device(ConnectedDevice):
     
     def send_ota_ack(self, data, status, message):
         key = api.Keys.ack
-        self.SdkClient.sendOTAAckCmd(data[key],status,message)
+        self.SdkClient.sendOTAAckCmd(data[key],status.value,message)
     
     def ota_cb(self,msg):
 
@@ -150,7 +150,7 @@ class demo_edge_device(ConnectedDevice):
 
     def send_ack(self, data, status, message, child_id = None):
         key = api.Keys.ack.value
-        self.SdkClient.sendAckCmd(data[key],status,message, child_id)
+        self.SdkClient.sendAckCmd(data[key],status.value,message, child_id)
 
     # def send_ack_if_needed(self,msg):
         
