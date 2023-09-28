@@ -17,7 +17,7 @@ def whoami():
 
 from models.api import api21 as api
 
-class otaDemoDevice(ConnectedDevice):
+class demo_edge_device(ConnectedDevice):
     api_ver = 2.1
     needs_exit:bool = False
 
