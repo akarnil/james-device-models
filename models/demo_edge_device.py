@@ -10,12 +10,18 @@ sys.path.append("iotconnect")
 from iotconnect import IoTConnectSDK as SdkClient
 
 import json
+import os
+import tarfile
+import shutil
+from urllib.request import urlretrieve 
 
 def whoami():
     import sys
     return sys._getframe(1).f_code.co_name
 
 from models.api import api21 as api
+
+from app_paths import app_paths
 
 class demo_edge_device(ConnectedDevice):
     api_ver = 2.1
@@ -106,6 +112,45 @@ class demo_edge_device(ConnectedDevice):
                 return
             
         self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
+
+    def ota_extract_to_a_and_move_old_a_to_b(tarball_name:str):
+        global app_paths
+        # extract tarball to new directory
+        file = tarfile.open(app_paths["main_dir"] + app_paths["tarball_download_dir"] + tarball_name)
+        file.extractall(app_paths["main_dir"] + app_paths["tarball_extract_dir"])
+        file.close()
+
+        # rm secondary dir
+        path = app_paths["main_dir"] + app_paths["secondary_app_dir"]
+        shutil.rmtree(path, ignore_errors=True)
+
+        # move primary to secondary
+        os.rename(app_paths["main_dir"] + app_paths["primary_app_dir"], app_paths["main_dir"] + app_paths["secondary_app_dir"])
+
+        # copy extracted dir to primary dir
+        src = app_paths["main_dir"] + app_paths["tarball_extract_dir"]
+        dst = app_paths["main_dir"] + app_paths["primary_app_dir"]
+        shutil.copytree(src, dst)
+
+        # delete temp folders
+        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_download_dir"], ignore_errors=True)
+        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_extract_dir"], ignore_errors=True)
+
+def ota_backup_primary():
+    global app_paths
+    src = app_paths["main_dir"] + app_paths["primary_app_dir"]
+    dst = app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"]
+    shutil.copytree(src, dst)
+
+def ota_restore_primary():
+    global app_paths
+    shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_dir"], ignore_errors=True)
+    os.rename(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], app_paths["main_dir"] + app_paths["primary_app_dir"])
+
+def ota_delete_primary_backup():
+    global app_paths
+    shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
+
 
     # def send_ack_if_needed(self,msg):
         
