@@ -65,46 +65,9 @@ class demo_edge_device(ConnectedDevice):
     def send_ota_ack(self, data, status, message):
         key = self.api_enums.msg_keys.ack
         self.SdkClient.sendOTAAckCmd(data[key],status,message)
-
-    def ota_extract_to_a_and_move_old_a_to_b(tarball_name:str):
-        global app_paths
-        # extract tarball to new directory
-        file = tarfile.open(app_paths["main_dir"] + app_paths["tarball_download_dir"] + tarball_name)
-        file.extractall(app_paths["main_dir"] + app_paths["tarball_extract_dir"])
-        file.close()
-
-        # rm secondary dir
-        path = app_paths["main_dir"] + app_paths["secondary_app_dir"]
-        shutil.rmtree(path, ignore_errors=True)
-
-        # move primary to secondary
-        os.rename(app_paths["main_dir"] + app_paths["primary_app_dir"], app_paths["main_dir"] + app_paths["secondary_app_dir"])
-
-        # copy extracted dir to primary dir
-        src = app_paths["main_dir"] + app_paths["tarball_extract_dir"]
-        dst = app_paths["main_dir"] + app_paths["primary_app_dir"]
-        shutil.copytree(src, dst)
-
-        # delete temp folders
-        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_download_dir"], ignore_errors=True)
-        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_extract_dir"], ignore_errors=True)
-
-    def ota_backup_primary():
-        global app_paths
-        src = app_paths["main_dir"] + app_paths["primary_app_dir"]
-        dst = app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"]
-        shutil.copytree(src, dst)
-
-    def ota_restore_primary():
-        global app_paths
-        shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_dir"], ignore_errors=True)
-        os.rename(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], app_paths["main_dir"] + app_paths["primary_app_dir"])
-
-    def ota_delete_primary_backup():
-        global app_paths
-        shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
-
+    
     def ota_cb(self,msg):
+
         command_type_got = self.get_command_type(msg)
         if command_type_got != api.CommandTypes.FIRMWARE:
             print("fail wrong command type")
@@ -137,21 +100,59 @@ class demo_edge_device(ConnectedDevice):
             self._needs_exit = False
             ota_backup_primary()
             try:
-                ota_extract_to_a_and_move_old_a_to_b(download_filename)
+                self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
                 self._needs_exit = True
             except:
-                ota_restore_primary()
+                self.ota_restore_primary()
                 self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED to install")
                 self._needs_exit = False
 
             if self._needs_exit:
-                ota_delete_primary_backup()
+                self.ota_delete_primary_backup()
                 self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
                 return
             
         self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
 
-    
+    def ota_extract_to_a_and_move_old_a_to_b(self,tarball_name:str):
+        global app_paths
+        # extract tarball to new directory
+        file = tarfile.open(app_paths["main_dir"] + app_paths["tarball_download_dir"] + tarball_name)
+        file.extractall(app_paths["main_dir"] + app_paths["tarball_extract_dir"])
+        file.close()
+
+        # rm secondary dir
+        path = app_paths["main_dir"] + app_paths["secondary_app_dir"]
+        shutil.rmtree(path, ignore_errors=True)
+
+        # move primary to secondary
+        os.rename(app_paths["main_dir"] + app_paths["primary_app_dir"], app_paths["main_dir"] + app_paths["secondary_app_dir"])
+
+        # copy extracted dir to primary dir
+        src = app_paths["main_dir"] + app_paths["tarball_extract_dir"]
+        dst = app_paths["main_dir"] + app_paths["primary_app_dir"]
+        shutil.copytree(src, dst)
+
+        # delete temp folders
+        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_download_dir"], ignore_errors=True)
+        shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_extract_dir"], ignore_errors=True)
+
+def ota_backup_primary(self):
+    global app_paths
+    src = app_paths["main_dir"] + app_paths["primary_app_dir"]
+    dst = app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"]
+    shutil.copytree(src, dst)
+
+def ota_restore_primary(self):
+    global app_paths
+    shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_dir"], ignore_errors=True)
+    os.rename(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], app_paths["main_dir"] + app_paths["primary_app_dir"])
+
+def ota_delete_primary_backup(self):
+    global app_paths
+    shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
+
+
     # def send_ack_if_needed(self,msg):
         
     #     if "ack" i n 
