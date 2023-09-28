@@ -4,11 +4,12 @@ from datetime import datetime
 # only to use a local copy of the SDK remove for release
 import sys
 sys.path.append("iotconnect")
+sys.path.append("/home/akarnil/Documents/Work/james-device-models/")
+
 # remove for release
 from iotconnect import IoTConnectSDK
 
-import api21
-
+from models.api import api21
 
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))

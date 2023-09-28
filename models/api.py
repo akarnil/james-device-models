@@ -7,6 +7,13 @@ class api21:
         EXECUTED = 5,
         SUCCESS = 7,
         EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
+        
+    class otaAcks(Enum):
+        SUCCESS = 0
+        FAILED = 1
+        DL_IN_PROGRESS = 2
+        DL_DONE = 3
+        DL_FAILED =4
 
     class MessageType(Enum):
         RPT = 0
@@ -47,7 +54,7 @@ class api21:
         RESETPWD = "resetpwd"
         UCART = "updatecrt"
 
-    class msg_fields(str, Enum):
+    class msg_keys(str, Enum):
         ack = 'ack'
         command_type = 'ct'
 
@@ -75,7 +82,7 @@ class api21:
     @classmethod
     def get_command_type(self, msg):
         ret = None
-        ct = self.msg_fields.command_type
+        ct = self.msg_keys.command_type
         if ct in msg:
             if msg[ct] in self.CommandTypes._value2member_map_:
                 ret = self.CommandTypes(msg[ct])
