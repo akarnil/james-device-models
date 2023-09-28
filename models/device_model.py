@@ -7,89 +7,7 @@ sys.path.append("iotconnect")
 # remove for release
 from iotconnect import IoTConnectSDK
 
-class api21:
-    from enum import Enum
-
-    # 2.1 enums
-    class ackCmdStatus(Enum):
-        FAIL = 4,
-        EXECUTED = 5,
-        SUCCESS = 7,
-        EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
-
-    class MessageType(Enum):
-        RPT = 0
-        FLT = 1
-        RPTEDGE = 2
-        RMEdge = 3
-        LOG = 4
-        ACK = 5
-        OTA = 6
-        FIRMWARE = 11
-
-    class ErrorCode(Enum):
-        OK = 0
-        DEV_NOT_REG = 1
-        AUTO_REG = 2
-        DEV_NOT_FOUND = 3
-        DEV_INACTIVE = 4
-        OBJ_MOVED = 5
-        CPID_NOT_FOUND = 6
-
-    class CommandTypes(Enum):
-        DCOMM = 0
-        FIRMWARE = 1
-        MODULE = 2
-        U_ATTRIBUTE = 101
-        U_SETTING = 102
-        U_RULE = 103
-        U_DEVICE = 104
-        DATA_FRQ = 105
-        U_barred = 106
-        D_Disabled = 107
-        D_Released = 108
-        STOP = 109
-        Start_Hr_beat = 110
-        Stop_Hr_beat = 111
-        is_connect = 116
-        SYNC = "sync"
-        RESETPWD = "resetpwd"
-        UCART = "updatecrt"
-
-    class msg_fields(str, Enum):
-        ack = 'ack'
-        command_type = 'ct'
-
-    class Option(Enum):
-        attribute = "att"
-        setting = "set"
-        protocol = "p"
-        device = "d"
-        sdkConfig = "sc"
-        rule = "r"
-
-    class DataType(Enum):
-        INT = 1
-        LONG = 2
-        FLOAT = 3
-        STRING = 4
-        Time = 5
-        Date = 6
-        DateTime = 7
-        BIT = 8
-        Boolean = 9
-        LatLong = 10
-        OBJECT = 11
-
-    @classmethod
-    def get_command_type(self, msg):
-        ret = None
-        ct = self.msg_fields.command_type
-        if ct in msg:
-            if msg[ct] in self.CommandTypes._value2member_map_:
-                ret = self.CommandTypes(msg[ct])
-        return ret
-
+import api21
 
 
 def print_msg(title, msg):
@@ -143,6 +61,7 @@ class ConnectedDevice(GenericDevice):
     CMD_TYPE_FIRMWARE = '0x02'
     CMD_TYPE_CONNECTION = '0x16'
 
+    # for now set to default to api21
     api_ver = 2.1
     api_enums = api21
 
@@ -164,6 +83,7 @@ class ConnectedDevice(GenericDevice):
                 self.SdkOptions,
                 self.init_cb
             )
+            self.bind_callbacks()
         else:
             # def __init__(self, cpId, uniqueId, listner, listner_twin, sdkOptions=None, env="PROD")
             self.SdkClient = IoTConnectSDK(
@@ -175,48 +95,81 @@ class ConnectedDevice(GenericDevice):
                 self.environment
             )
 
+    def set_api_enums(self):
+        if self.api_ver == 2.1:
+            return api21
+        #etc
+
+    def ota_cb(self,msg):
+        pass
+
+    def module_cb(self,msg):
+        pass
+
+    def twin_change_cb(self,msg):
+        pass
+
+    def attribute_change_cb(self,msg):
+        pass
+
+    def device_change_cb(self,msg):
+        pass
+
+    def rule_change_cb(self,msg):
+        pass
 
     def init_cb(self, msg):
         if self.api_enums.get_command_type(msg) == self.api_enums.CommandTypes.is_connect:
             print("connection status is " + msg["command"])
 
     def device_cb(self, msg, status=None):
-        
-        if status is None:
-            print("device callback")
-            print(json.dumps(msg, indent=2))
-            command_type = msg['ct']
+        pass
+        # if status is None:
+        #     print("device callback")
+        #     print(json.dumps(msg, indent=2))
+        #     command_type = msg['ct']
 
-            if command_type == self.CMD_TYPE_DEVICE:
-                print("device command cmdType")
+        #     if command_type == self.CMD_TYPE_DEVICE:
+        #         print("device command cmdType")
 
-            elif command_type == self.CMD_TYPE_FIRMWARE:
-                print("firmware cmdType")
+        #     elif command_type == self.CMD_TYPE_FIRMWARE:
+        #         print("firmware cmdType")
 
-            elif command_type == self.CMD_TYPE_CONNECTION:
-                # Device connection status e.g. data["command"] = true(connected) or false(disconnected)
-                print("connection status cmdType")
+        #     elif command_type == self.CMD_TYPE_CONNECTION:
+        #         # Device connection status e.g. data["command"] = true(connected) or false(disconnected)
+        #         print("connection status cmdType")
 
-            elif command_type == 116:
-                print("connection status is " + msg["command"])
+        #     elif command_type == 116:
+        #         print("connection status is " + msg["command"])
 
-            else:
-                print("unimplemented cmdType: {}".format(command_type))
+        #     else:
+        #         print("unimplemented cmdType: {}".format(command_type))
 
-            print_msg("message", msg)
+        #     print_msg("message", msg)
 
-        if msg['ack'] == "True":
-            print_msg("ack message", msg)
-            d2c_msg = {
-                "ackId": msg["ackId"],
-                "st": status,
-                "msg": "",
-                "childId": ""
-            }
-            self.SdkClient.SendACK(d2c_msg, 5)  # 5 : command acknowledgement
+        # if msg['ack'] == "True":
+        #     print_msg("ack message", msg)
+        #     d2c_msg = {
+        #         "ackId": msg["ackId"],
+        #         "st": status,
+        #         "msg": "",
+        #         "childId": ""
+        #     }
+        #     self.SdkClient.SendACK(d2c_msg, 5)  # 5 : command acknowledgement
 
 
+    def bind_callbacks(self):
+        self.SdkClient.onOTACommand(self.ota_cb)
+        self.SdkClient.onModuleCommand(self.module_cb)
+        self.SdkClient.onTwinChangeCommand(self.twin_change_cb)
+        self.SdkClient.onAttrChangeCommand(self.attribute_change_cb)
+        self.SdkClient.onDeviceChangeCommand(self.device_change_cb)
+        self.SdkClient.onRuleChangeCommand(self.rule_change_cb)
+        self.SdkClient.onDeviceCommand(self.device_cb)
 
+
+    # there might overlaps with some of the call backs above and below, will need to check
+    
     def send_device_states(self):
         data_array = [self.get_d2c_data()]
         if self.children is not None:
