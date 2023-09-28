@@ -48,7 +48,7 @@ def main():
             device.send_d2c(data)
             print("sending data")  # , data_sent)
             time.sleep(30)
-            
+
     except KeyboardInterrupt:
         print ("Keyboard Interrupt Exception")
         os.abort()

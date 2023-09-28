@@ -60,17 +60,17 @@ class demo_edge_device(ConnectedDevice):
         return data_array
     
     def get_command_type(self,msg):
-        return self.api_enums.get_command_type(msg)
+        return self.api_enums.get_command_enum(msg)
     
-    def send_ota_ack(self, data, status: api.OtaStat, message):
+    def send_ota_ack(self, data, status, message):
         key = api.Keys.ack
-        self.SdkClient.sendOTAAckCmd(data[key],status.value,message)
+        self.SdkClient.sendOTAAckCmd(data[key],status,message)
     
     def ota_cb(self,msg):
-        command_type_got = self.get_command_type(msg)
-        if command_type_got != api.Commands.FIRMWARE:
+
+        if self.api_enums.get_enum_from_key(msg,api.Keys.command_type) != api.Commands.FIRMWARE:
             print("fail wrong command type")
-            return
+            return  
         
         payload_valid: bool = False
         data: dict = msg
@@ -148,9 +148,9 @@ class demo_edge_device(ConnectedDevice):
     def ota_delete_primary_backup(self):
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
 
-    def send_ack(self, data, status: api.AckStat, message, child_id = None):
+    def send_ack(self, data, status, message, child_id = None):
         key = api.Keys.ack.value
-        self.SdkClient.sendAckCmd(data[key],status.value,message, child_id)
+        self.SdkClient.sendAckCmd(data[key],status,message, child_id)
 
     # def send_ack_if_needed(self,msg):
         
@@ -169,7 +169,7 @@ class demo_edge_device(ConnectedDevice):
         print("device callback received")
 
         
-        if (command_type := self.api_enums.get_command_type(msg)) != None:      
+        if (command_type := self.api_enums.get_command_enum(msg)) != None:      
             child_id_to_send = self.api_enums.get_value_from_key(msg, api.Keys.id)
             
             if command_type == self.api_enums.Commands.DCOMM:
