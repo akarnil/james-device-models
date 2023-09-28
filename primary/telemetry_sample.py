@@ -34,10 +34,10 @@ def main():
     device = demo_edge_device(company_id, unique_id, environment, sdk_id, sdk_options)
     device.connect()
 
-    msg_raw = '{"v": "2.1", "ct": 1, "cmd": "ota", "ack": "eddd3dc2-510b-4452-900a-fd066c5e3b00", "sw": "3", "hw": "1", "urls": [{"url": "https://pociotconnectblobstorage.blob.core.windows.net/firmware/FE285043-EEFA-4201-9B84-50F7822774AD.gz?sv=2018-03-28&sr=b&sig=F6xYdk0zT4SMQetEqRO1gXCAPndGwQ4XS0r7PCU32H0%3D&se=2023-09-28T11%3A34%3A42Z&sp=r", "fileName": "FE285043-EEFA-4201-9B84-50F7822774AD.gz"}]}'
-    msg = json.loads(msg_raw)
-    print(json.dumps(msg))
-    device.ota_cb(msg)
+    # msg_raw = '{"v": "2.1", "ct": 1, "cmd": "ota", "ack": "eddd3dc2-510b-4452-900a-fd066c5e3b00", "sw": "3", "hw": "1", "urls": [{"url": "https://pociotconnectblobstorage.blob.core.windows.net/firmware/FE285043-EEFA-4201-9B84-50F7822774AD.gz?sv=2018-03-28&sr=b&sig=F6xYdk0zT4SMQetEqRO1gXCAPndGwQ4XS0r7PCU32H0%3D&se=2023-09-28T11%3A34%3A42Z&sp=r", "fileName": "FE285043-EEFA-4201-9B84-50F7822774AD.gz"}]}'
+    # msg = json.loads(msg_raw)
+    # print(json.dumps(msg))
+    # device.ota_cb(msg)
 
     while device.needs_exit == False:
         data = device.generate_d2c_data(generate_dummy_data())

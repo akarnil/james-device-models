@@ -97,17 +97,17 @@ class demo_edge_device(ConnectedDevice):
                 raise
             self.send_ota_ack(data, api.otaAcks.DL_DONE, "payload downloaded")
             
-            self._needs_exit = False
-            ota_backup_primary()
+            self.needs_exit = False
+            self.ota_backup_primary()
             try:
                 self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
-                self._needs_exit = True
+                self.needs_exit = True
             except:
                 self.ota_restore_primary()
                 self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED to install")
-                self._needs_exit = False
+                self.needs_exit = False
 
-            if self._needs_exit:
+            if self.needs_exit:
                 self.ota_delete_primary_backup()
                 self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
                 return
@@ -189,6 +189,7 @@ class demo_edge_device(ConnectedDevice):
 
         print("callback received not valid")
         print("rule command",msg)
+
     def device_command(self, msg):
         command = msg['command'].split(' ')
         if command[0] == "setPower":
