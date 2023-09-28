@@ -82,6 +82,12 @@ class api21:
 
     @classmethod
     def get_value_from_key(self, msg, key):
+        if (ret := self.get_enum_from_key(msg, key)) != None:
+            return ret.value
+        return None      
+    
+    @classmethod
+    def get_enum_from_key(self, msg, key):
         ret = None
         if key in msg:
             if msg[key] in self.Commands._value2member_map_:
@@ -89,5 +95,10 @@ class api21:
         return ret
     
     @classmethod
-    def get_command_type(self, msg):
-        return self.get_value_from_key(msg, self.Keys.command_type) 
+    def get_command_enum(self, msg):
+        return self.get_enum_from_key(msg, self.Keys.command_type) 
+    
+    @classmethod
+    def value_is(self, msg, key1, key2):
+            return self.get_enum_from_key(msg,key1) == key2
+        
