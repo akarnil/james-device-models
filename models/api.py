@@ -57,6 +57,7 @@ class api21:
     class Keys(str, Enum):
         ack = 'ack'
         command_type = 'ct'
+        id = 'id'
 
     class Option(Enum):
         attribute = "att"
@@ -80,10 +81,13 @@ class api21:
         OBJECT = 11
 
     @classmethod
-    def get_command_type(self, msg):
+    def get_value_from_key(self, msg, key):
         ret = None
-        ct = self.Keys.command_type
-        if ct in msg:
-            if msg[ct] in self.Commands._value2member_map_:
-                ret = self.Commands(msg[ct])
+        if key in msg:
+            if msg[key] in self.Commands._value2member_map_:
+                ret = self.Commands(msg[key])
         return ret
+    
+    @classmethod
+    def get_command_type(self, msg):
+        return self.get_value_from_key(msg, self.Keys.command_type) 

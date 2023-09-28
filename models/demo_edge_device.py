@@ -148,6 +148,9 @@ class demo_edge_device(ConnectedDevice):
     def ota_delete_primary_backup(self):
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
 
+    def send_ack(self, data, status: api.AckStat, message, child_id = None):
+        key = api.Keys.ack.value
+        self.SdkClient.sendAckCmd(data[key],status.value,message, child_id)
 
     # def send_ack_if_needed(self,msg):
         
@@ -166,21 +169,19 @@ class demo_edge_device(ConnectedDevice):
         print("device callback received")
 
         
-        command_type_got = self.api_enums.get_command_type(msg)
-        if command_type_got != None:        
-            child_id_to_send = None
-            if "id" in msg:
-                child_id_to_send = msg["id"]
-
-            if command_type_got == self.api_enums.Commands.DCOMM:
+        if (command_type := self.api_enums.get_command_type(msg)) != None:      
+            child_id_to_send = self.api_enums.get_value_from_key(msg, api.Keys.id)
+            
+            if command_type == self.api_enums.Commands.DCOMM:
                 # do something cool here
-                self.SdkClient.sendAckCmd(msg["ack"], self.api_enums.AckStat.SUCCESS, "Sending SUCCESSFUL", child_id_to_send)
+                self.send_ack(msg,self.api_enums.AckStat.SUCCESS, "SUCCESS", child_id_to_send) # need to check if ack has been requested then send it
+                
 
-            if command_type_got == self.api_enums.Commands.is_connect:
+            if command_type == self.api_enums.Commands.is_connect:
                 print("connection status is " + msg["command"])
 
             else:
-                print(whoami() + " got sent command_type     " + command_type_got.name)
+                print(whoami() + " got sent command_type     " + command_type.name)
             return
 
         print("callback received not valid")
