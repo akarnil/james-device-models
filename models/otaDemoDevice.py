@@ -1,17 +1,21 @@
 import requests
 
-from models.device_model import ConnectedDevice
+try:
+    from models.device_model import ConnectedDevice
+except:
+    from device_model import ConnectedDevice
 
 import sys
 sys.path.append("iotconnect")
 from iotconnect import IoTConnectSDK as SdkClient
 
+import json
 
 def whoami():
     import sys
     return sys._getframe(1).f_code.co_name
 
-
+from models.api import api21 as api
 
 class otaDemoDevice(ConnectedDevice):
     api_ver = 2.1
@@ -49,6 +53,60 @@ class otaDemoDevice(ConnectedDevice):
         }
         return data_array
     
+    def get_command_type(self,msg):
+        return self.api_enums.get_command_type(msg)
+    
+    def send_ota_ack(self, data, status, message):
+        key = self.api_enums.msg_keys.ack
+        self.SdkClient.sendOTAAckCmd(data[key],status,message)
+    
+    def ota_cb(self,msg):
+        command_type_got = self.get_command_type(msg)
+        if command_type_got != api.CommandTypes.FIRMWARE:
+            print("fail wrong command type")
+            return
+        
+        payload_valid: bool = False
+        data: dict = msg
+        
+        if ("urls" in data) and len(data["urls"]) == 1:                
+            if ("url" in data["urls"][0]) and ("fileName" in data["urls"][0]):
+                if (data["urls"][0]["fileName"].endswith(".gz")):
+                    payload_valid = True   
+
+        if payload_valid is True:
+            urls = data["urls"][0]    
+            # download tarball from url to download_dir
+            url: str = urls["url"]
+            download_filename: str = urls["fileName"]
+            final_folder_dest:str = app_paths["main_dir"] + app_paths["tarball_download_dir"]
+            if os.path.exists(final_folder_dest) == False:
+                os.mkdir(final_folder_dest)
+            try:
+                self.send_ota_ack(data, api.otaAcks.DL_IN_PROGRESS, "downloading payload")
+                urlretrieve(url, final_folder_dest + download_filename)
+            except:
+                self.send_ota_ack(data, api.otaAcks.DL_FAILED, "payload dl failed")
+                raise
+            self.send_ota_ack(data, api.otaAcks.DL_DONE, "payload downloaded")
+            
+            self._needs_exit = False
+            ota_backup_primary()
+            try:
+                ota_extract_to_a_and_move_old_a_to_b(download_filename)
+                self._needs_exit = True
+            except:
+                ota_restore_primary()
+                self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED to install")
+                self._needs_exit = False
+
+            if self._needs_exit:
+                ota_delete_primary_backup()
+                self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
+                return
+            
+        self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
+
     # def send_ack_if_needed(self,msg):
         
     #     if "ack" i n 
@@ -63,27 +121,25 @@ class otaDemoDevice(ConnectedDevice):
     #     self.SdkClient.SendACK(d2c_msg, 5)  # 5 : command acknowledgement
 
     def device_cb(self,msg):
-        pass
-        # print("device callback received")
-        # command_type_got = None
-        # if "ct" in msg:
-        #     if msg["ct"] in CommandType._value2member_map_:
-        #         command_type_got = CommandType(msg["ct"])
+        print("device callback received")
 
-        # if command_type_got != None:        
-        #     child_id_to_send = None
-        #     if "id" in msg:
-        #         child_id_to_send = msg["id"]
+        
+        command_type_got = self.api_enums.get_command_type(msg)
+        if command_type_got != None:        
+            child_id_to_send = None
+            if "id" in msg:
+                child_id_to_send = msg["id"]
 
-        #     if command_type_got == CommandType.DCOMM:
-        #         self.SdkClient.sendAckCmd(msg["ack"], ackCmdStatus.SUCCESS, "Sending SUCCESSFUL", child_id_to_send)
+            if command_type_got == self.api_enums.CommandTypes.DCOMM:
+                # do something cool here
+                self.SdkClient.sendAckCmd(msg["ack"], self.api_enums.ackCmdStatus.SUCCESS, "Sending SUCCESSFUL", child_id_to_send)
 
-        #     if command_type_got == CommandType.is_connect:
-        #         print("connection status is " + msg["command"])
+            if command_type_got == self.api_enums.CommandTypes.is_connect:
+                print("connection status is " + msg["command"])
 
-        #     else:
-        #         print(whoami() + " got sent command_type     " + command_type_got.name)
-        #     return
+            else:
+                print(whoami() + " got sent command_type     " + command_type_got.name)
+            return
 
         print("callback received not valid")
         print("rule command",msg)
@@ -121,3 +177,7 @@ class otaDemoDevice(ConnectedDevice):
             }
         ]
         return export_dict
+
+
+if __name__ == "__main__":
+    pass
