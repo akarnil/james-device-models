@@ -120,7 +120,7 @@ class ConnectedDevice(GenericDevice):
         pass
 
     def init_cb(self, msg):
-        if self.api_enums.get_command_type(msg) == self.api_enums.CommandTypes.is_connect:
+        if self.api_enums.get_command_type(msg) == self.api_enums.Commands.is_connect:
             print("connection status is " + msg["command"])
 
     def device_cb(self, msg, status=None):

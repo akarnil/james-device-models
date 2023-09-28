@@ -6,6 +6,9 @@ from models.demo_edge_device import demo_edge_device
 
 import json
 
+import os
+import sys
+
 
 unique_id = "linuxPythonDemo"
 sdk_id = "Yjg5MmMzNThlMzc1NGNjMzg4NDEzMmUyNzFlMjYxNTE=UDI6MDM6NzAuMTQ="
@@ -39,12 +42,18 @@ def main():
     # print(json.dumps(msg))
     # device.ota_cb(msg)
 
-    while device.needs_exit == False:
-        data = device.generate_d2c_data(generate_dummy_data())
-        device.send_d2c(data)
-        print("sending data")  # , data_sent)
-        
-        time.sleep(10)
+    try:
+        while device.needs_exit == False:
+            data = device.generate_d2c_data(generate_dummy_data())
+            device.send_d2c(data)
+            print("sending data")  # , data_sent)
+            time.sleep(30)
+            
+    except KeyboardInterrupt:
+        print ("Keyboard Interrupt Exception")
+        os.abort()
+    except Exception as ex:
+        print(ex.message)
+        sys.exit(0)   
 
-if __name__ == "__main__":
-    main()
+    print("APP EXIT")

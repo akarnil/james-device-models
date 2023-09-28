@@ -62,14 +62,13 @@ class demo_edge_device(ConnectedDevice):
     def get_command_type(self,msg):
         return self.api_enums.get_command_type(msg)
     
-    def send_ota_ack(self, data, status, message):
-        key = self.api_enums.msg_keys.ack
-        self.SdkClient.sendOTAAckCmd(data[key],status,message)
+    def send_ota_ack(self, data, status: api.OtaStat, message):
+        key = api.Keys.ack
+        self.SdkClient.sendOTAAckCmd(data[key],status.value,message)
     
     def ota_cb(self,msg):
-
         command_type_got = self.get_command_type(msg)
-        if command_type_got != api.CommandTypes.FIRMWARE:
+        if command_type_got != api.Commands.FIRMWARE:
             print("fail wrong command type")
             return
         
@@ -90,33 +89,30 @@ class demo_edge_device(ConnectedDevice):
             if os.path.exists(final_folder_dest) == False:
                 os.mkdir(final_folder_dest)
             try:
-                self.send_ota_ack(data, api.otaAcks.DL_IN_PROGRESS, "downloading payload")
+                self.send_ota_ack(data, api.OtaStat.DL_IN_PROGRESS, "downloading payload")
                 urlretrieve(url, final_folder_dest + download_filename)
             except:
-                self.send_ota_ack(data, api.otaAcks.DL_FAILED, "payload dl failed")
+                self.send_ota_ack(data, api.OtaStat.DL_FAILED, "payload dl failed")
                 raise
-            self.send_ota_ack(data, api.otaAcks.DL_DONE, "payload downloaded")
+            self.send_ota_ack(data, api.OtaStat.DL_DONE, "payload downloaded")
             
             self.needs_exit = False
             self.ota_backup_primary()
             try:
                 self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
                 self.needs_exit = True
+            except:
+                self.ota_restore_primary()
+                self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED to install")
+                self.needs_exit = False
+                raise
+
+            if self.needs_exit:
                 self.ota_delete_primary_backup()
                 self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
                 return
             
-            except:
-                self.ota_restore_primary()
-                self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED to install")
-                self.needs_exit = False
-                raise
-            # if self.needs_exit:
-            #     self.ota_delete_primary_backup()
-            #     self.send_ota_ack(data, api.otaAcks.SUCCESS, "OTA SUCCESS")
-            #     return
-            
-        self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
+        self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED,invalid payload")
 
     def ota_extract_to_a_and_move_old_a_to_b(self,tarball_name:str):
         # extract tarball to new directory
@@ -176,11 +172,11 @@ class demo_edge_device(ConnectedDevice):
             if "id" in msg:
                 child_id_to_send = msg["id"]
 
-            if command_type_got == self.api_enums.CommandTypes.DCOMM:
+            if command_type_got == self.api_enums.Commands.DCOMM:
                 # do something cool here
-                self.SdkClient.sendAckCmd(msg["ack"], self.api_enums.ackCmdStatus.SUCCESS, "Sending SUCCESSFUL", child_id_to_send)
+                self.SdkClient.sendAckCmd(msg["ack"], self.api_enums.AckStat.SUCCESS, "Sending SUCCESSFUL", child_id_to_send)
 
-            if command_type_got == self.api_enums.CommandTypes.is_connect:
+            if command_type_got == self.api_enums.Commands.is_connect:
                 print("connection status is " + msg["command"])
 
             else:

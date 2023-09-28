@@ -2,18 +2,18 @@ class api21:
     from enum import Enum
 
     # 2.1 enums
-    class ackCmdStatus(Enum):
+    class AckStat(Enum):
         FAIL = 4,
         EXECUTED = 5,
         SUCCESS = 7,
         EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
         
-    class otaAcks(Enum):
+    class OtaStat(Enum):
         SUCCESS = 0
         FAILED = 1
         DL_IN_PROGRESS = 2
         DL_DONE = 3
-        DL_FAILED =4
+        DL_FAILED= 4
 
     class MessageType(Enum):
         RPT = 0
@@ -34,7 +34,7 @@ class api21:
         OBJ_MOVED = 5
         CPID_NOT_FOUND = 6
 
-    class CommandTypes(Enum):
+    class Commands(Enum):
         DCOMM = 0
         FIRMWARE = 1
         MODULE = 2
@@ -54,7 +54,7 @@ class api21:
         RESETPWD = "resetpwd"
         UCART = "updatecrt"
 
-    class msg_keys(str, Enum):
+    class Keys(str, Enum):
         ack = 'ack'
         command_type = 'ct'
 
@@ -82,8 +82,8 @@ class api21:
     @classmethod
     def get_command_type(self, msg):
         ret = None
-        ct = self.msg_keys.command_type
+        ct = self.Keys.command_type
         if ct in msg:
-            if msg[ct] in self.CommandTypes._value2member_map_:
-                ret = self.CommandTypes(msg[ct])
+            if msg[ct] in self.Commands._value2member_map_:
+                ret = self.Commands(msg[ct])
         return ret
