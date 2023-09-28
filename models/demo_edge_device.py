@@ -115,7 +115,6 @@ class demo_edge_device(ConnectedDevice):
         self.send_ota_ack(data, api.otaAcks.FAILED, "OTA FAILED,invalid payload")
 
     def ota_extract_to_a_and_move_old_a_to_b(self,tarball_name:str):
-        global app_paths
         # extract tarball to new directory
         file = tarfile.open(app_paths["main_dir"] + app_paths["tarball_download_dir"] + tarball_name)
         file.extractall(app_paths["main_dir"] + app_paths["tarball_extract_dir"])
@@ -138,18 +137,15 @@ class demo_edge_device(ConnectedDevice):
         shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_extract_dir"], ignore_errors=True)
 
     def ota_backup_primary(self):
-        global app_paths
         src = app_paths["main_dir"] + app_paths["primary_app_dir"]
         dst = app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"]
         shutil.copytree(src, dst)
 
     def ota_restore_primary(self):
-        global app_paths
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_dir"], ignore_errors=True)
         os.rename(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], app_paths["main_dir"] + app_paths["primary_app_dir"])
 
     def ota_delete_primary_backup(self):
-        global app_paths
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
 
 
