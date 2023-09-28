@@ -109,7 +109,7 @@ class demo_edge_device(ConnectedDevice):
 
             if self.needs_exit:
                 self.ota_delete_primary_backup()
-                self.send_ota_ack(data, api.OtaStat.FAILED, "OTA SUCCESS")
+                self.send_ota_ack(data, api.OtaStat.SUCCESS, "OTA SUCCESS")
                 return
             
         self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED,invalid payload")
