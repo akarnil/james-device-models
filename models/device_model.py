@@ -7,6 +7,89 @@ sys.path.append("iotconnect")
 # remove for release
 from iotconnect import IoTConnectSDK
 
+class api21:
+    from enum import Enum
+
+    # 2.1 enums
+    class ackCmdStatus(Enum):
+        FAIL = 4,
+        EXECUTED = 5,
+        SUCCESS = 7,
+        EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
+
+    class MessageType(Enum):
+        RPT = 0
+        FLT = 1
+        RPTEDGE = 2
+        RMEdge = 3
+        LOG = 4
+        ACK = 5
+        OTA = 6
+        FIRMWARE = 11
+
+    class ErrorCode(Enum):
+        OK = 0
+        DEV_NOT_REG = 1
+        AUTO_REG = 2
+        DEV_NOT_FOUND = 3
+        DEV_INACTIVE = 4
+        OBJ_MOVED = 5
+        CPID_NOT_FOUND = 6
+
+    class CommandTypes(Enum):
+        DCOMM = 0
+        FIRMWARE = 1
+        MODULE = 2
+        U_ATTRIBUTE = 101
+        U_SETTING = 102
+        U_RULE = 103
+        U_DEVICE = 104
+        DATA_FRQ = 105
+        U_barred = 106
+        D_Disabled = 107
+        D_Released = 108
+        STOP = 109
+        Start_Hr_beat = 110
+        Stop_Hr_beat = 111
+        is_connect = 116
+        SYNC = "sync"
+        RESETPWD = "resetpwd"
+        UCART = "updatecrt"
+
+    class msg_fields(str, Enum):
+        ack = 'ack'
+        command_type = 'ct'
+
+    class Option(Enum):
+        attribute = "att"
+        setting = "set"
+        protocol = "p"
+        device = "d"
+        sdkConfig = "sc"
+        rule = "r"
+
+    class DataType(Enum):
+        INT = 1
+        LONG = 2
+        FLOAT = 3
+        STRING = 4
+        Time = 5
+        Date = 6
+        DateTime = 7
+        BIT = 8
+        Boolean = 9
+        LatLong = 10
+        OBJECT = 11
+
+    @classmethod
+    def get_command_type(self, msg):
+        ret = None
+        ct = self.msg_fields.command_type
+        if ct in msg:
+            if msg[ct] in self.CommandTypes._value2member_map_:
+                ret = self.CommandTypes(msg[ct])
+        return ret
+
 
 
 def print_msg(title, msg):
@@ -60,7 +143,8 @@ class ConnectedDevice(GenericDevice):
     CMD_TYPE_FIRMWARE = '0x02'
     CMD_TYPE_CONNECTION = '0x16'
 
-    api_ver = 1.0
+    api_ver = 2.1
+    api_enums = api21
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
@@ -78,7 +162,7 @@ class ConnectedDevice(GenericDevice):
                 self.unique_id,
                 self.sdk_id,
                 self.SdkOptions,
-                self.device_cb
+                self.init_cb
             )
         else:
             # def __init__(self, cpId, uniqueId, listner, listner_twin, sdkOptions=None, env="PROD")
@@ -92,7 +176,9 @@ class ConnectedDevice(GenericDevice):
             )
 
 
-
+    def init_cb(self, msg):
+        if self.api_enums.get_command_type(msg) == self.api_enums.CommandTypes.is_connect:
+            print("connection status is " + msg["command"])
 
     def device_cb(self, msg, status=None):
         
@@ -128,6 +214,8 @@ class ConnectedDevice(GenericDevice):
                 "childId": ""
             }
             self.SdkClient.SendACK(d2c_msg, 5)  # 5 : command acknowledgement
+
+
 
     def send_device_states(self):
         data_array = [self.get_d2c_data()]
