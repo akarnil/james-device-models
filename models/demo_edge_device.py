@@ -75,21 +75,11 @@ class demo_edge_device(ConnectedDevice):
         print(request_id)
         self.direct_message_ack(request_id, {"fire": False})
 
-    def get_state(self):
-        data_array = {
-            "level": self.level,
-            "power": self.power
-        }
-        return data_array
-    
-    def get_command_type(self,msg):
-        return self.api_enums.get_command_enum(msg)
-    
-    
+        
     def ota_cb(self,msg):
         OtaHandler(self,msg)
 
-    def send_ack(self, data, status, message, child_id = None):
+    def send_ack(self, data, status: api.AckStat, message, child_id = None):
         key = api.Keys.ack.value
         self.SdkClient.sendAckCmd(data[key],status.value,message, child_id)
 
