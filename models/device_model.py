@@ -9,7 +9,7 @@ sys.path.append("/home/akarnil/Documents/Work/james-device-models/")
 # remove for release
 from iotconnect import IoTConnectSDK
 
-from models.api import api21
+from models.enums import Enums as e
 
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))
@@ -64,7 +64,6 @@ class ConnectedDevice(GenericDevice):
 
     # for now set to default to api21
     api_ver = 2.1
-    api_enums = api21
 
     needs_exit:bool = False
 
@@ -98,11 +97,6 @@ class ConnectedDevice(GenericDevice):
                 self.environment
             )
 
-    def set_api_enums(self):
-        if self.api_ver == 2.1:
-            return api21
-        #etc
-
     def ota_cb(self,msg):
         pass
 
@@ -122,8 +116,9 @@ class ConnectedDevice(GenericDevice):
         pass
 
     def init_cb(self, msg):
-        if self.api_enums.get_command_enum(msg) == self.api_enums.Commands.is_connect:
+        if e.get_command_type(msg) != e.Values.Commands.is_connect:
             print("connection status is " + msg["command"])
+        
 
     def device_cb(self, msg, status=None):
         pass

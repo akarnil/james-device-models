@@ -1,9 +1,7 @@
 import requests
 
-try:
-    from models.device_model import ConnectedDevice
-except:
-    from device_model import ConnectedDevice
+from models.device_model import ConnectedDevice
+
 
 import sys
 sys.path.append("iotconnect")
@@ -11,12 +9,12 @@ from iotconnect import IoTConnectSDK as SdkClient
 
 import json
 
+from models.enums import Enums as e
 
 def whoami():
     import sys
     return sys._getframe(1).f_code.co_name
 
-from models.api import api21 as api
 from models.ota_handler import OtaHandler
 
 import random
@@ -79,19 +77,19 @@ class demo_edge_device(ConnectedDevice):
     def ota_cb(self,msg):
         OtaHandler(self,msg)
 
-    def send_ack(self, data, status: api.AckStat, message, child_id = None):
-        key_str = self.api_enums.Keys.ack.value
+    def send_ack(self, data, status: e.Values.AckStat, message, child_id = None):
+        key_str = e.Keys.ack.value
         status_int = status.value
         self.SdkClient.sendAckCmd(data[key_str], status_int ,message, child_id)
 
-    def send_ack_if_needed(self, msg, status: api.AckStat, message):
+    def send_ack_if_needed(self, msg, status: e.Values.AckStat, message):
 
         # check if ack exists in message 
-        if not self.api_enums.key_in_msg(msg, self.api_enums.Keys.ack):
+        if not e.key_in_msg(msg, e.Keys.ack):
             print(" Ack not requested, returning")
             return
         
-        id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
+        id_to_send = e.get_value_using_key(msg, e.Keys.id)
         self.send_ack(msg, status, message, id_to_send)
 
 
@@ -99,14 +97,14 @@ class demo_edge_device(ConnectedDevice):
         print("device callback received")
 
         # check command type got from message
-        if (command_type := self.api_enums.get_command_enum(msg)) != None:      
+        if (command_type := e.get_command_type(msg)) != None:      
             
-            if command_type == self.api_enums.Commands.DCOMM:
+            if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
-                self.send_ack_if_needed(msg,self.api_enums.AckStat.SUCCESS, "Got DCOMM command successfully")
+                self.send_ack_if_needed(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
-            if command_type == self.api_enums.Commands.is_connect:
+            if command_type == e.Values.Commands.is_connect:
                 print("connection status is " + msg["command"])
 
             else:
