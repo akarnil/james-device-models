@@ -178,7 +178,9 @@ class ConnectedDevice(GenericDevice):
         if self.children is not None:
             for child in self.children:
                 data_array.append(child.get_d2c_data())
-        self.send_d2c(data_array)
+
+        for data in data_array:
+            self.send_d2c(data)
         return data_array
 
     def send_d2c(self, data):
