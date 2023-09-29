@@ -20,6 +20,8 @@ from models.ota_handler import OtaHandler
 
 import random
 from datetime import datetime
+from typing import Union # to use Union[Enum, None] type hint
+
 
 
 class demo_edge_device(ConnectedDevice):
@@ -92,7 +94,6 @@ class demo_edge_device(ConnectedDevice):
             if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
                 self.device_command(msg)
-                self.send_ack(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
             if command_type == e.Values.Commands.is_connect:
@@ -105,16 +106,24 @@ class demo_edge_device(ConnectedDevice):
         print("callback received not valid")
         print("rule command",msg)
 
+    def get_device_command(self, msg) -> Union[Enum, None]:
+        command_enum = None
+        if (full_command := e.get_value_using_key(msg, e.Keys.device_command)) is not None:
+            for mem in self.DeviceCommands._value2member_map_:
+                if (command_sliced := full_command[:len(mem)]) == mem:
+                    command_enum = self.DeviceCommands(command_sliced)
+                    break
+        return command_enum
+
     def device_command(self, msg):
-        command = e.get_value_using_key(msg, e.Keys.device_command)
-        print(command)
-        return
-        command = msg['command'].split(' ')
-        if command[0] == "setPower":
-            self.power = int(command[1])  # == '1')
-            print("self.power = {}".format(self.power))
-            status = 6  # 6 = command success
-            return status
+        command_enum = self.get_device_command(msg)
+
+        if command_enum == self.DeviceCommands.ECHO:
+            full_command = e.get_value_using_key(msg, e.Keys.device_command)
+            to_print = full_command[len(self.DeviceCommands.ECHO.value):]
+            print(to_print)
+            self.send_ack(msg,e.Values.AckStat.SUCCESS, "Command Executed Successfully")
+
 
     def firmware_command(self, msg):
         print("firmware\nhw: {}, sw: {}, {} urls".format(msg["ver"]["hw"], msg["ver"]["sw"], len(msg["urls"])))
