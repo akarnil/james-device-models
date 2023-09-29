@@ -84,29 +84,26 @@ class demo_edge_device(ConnectedDevice):
         status_int = status.value
         self.SdkClient.sendAckCmd(data[key_str], status_int ,message, child_id)
 
-    def send_ack_if_needed(self, msg, status: api.AckStat, message, child_id = None):
+    def send_ack_if_needed(self, msg, status: api.AckStat, message):
 
         # check if ack exists in message 
         if not self.api_enums.key_in_msg(msg, self.api_enums.Keys.ack):
             print(" Ack not requested, returning")
             return
         
-        id_to_send = None
-        if child_id is not None:
-            id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
+        id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
         self.send_ack(msg, status, message, id_to_send)
 
 
     def device_cb(self,msg):
         print("device callback received")
 
-        
+        # check command type got from message
         if (command_type := self.api_enums.get_command_enum(msg)) != None:      
-            child_id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
             
             if command_type == self.api_enums.Commands.DCOMM:
                 # do something cool here
-                self.send_ack(msg,self.api_enums.AckStat.SUCCESS, "SUCCESS", child_id_to_send) # need to check if ack has been requested then send it
+                self.send_ack_if_needed(msg,self.api_enums.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
             if command_type == self.api_enums.Commands.is_connect:

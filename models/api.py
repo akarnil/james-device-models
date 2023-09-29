@@ -1,11 +1,11 @@
-class api21:
-    from enum import Enum
+from enum import Enum
 
+class api21:
     # 2.1 enums
     class AckStat(Enum):
-        FAIL = 4,
-        EXECUTED = 5,
-        SUCCESS = 7,
+        FAIL = 4
+        EXECUTED = 5
+        SUCCESS = 7
         EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
         
     class OtaStat(Enum):
@@ -80,29 +80,39 @@ class api21:
         LatLong = 10
         OBJECT = 11
 
+    # need to match this somehow cleanly, right now the function will do
+    @classmethod
+    def get_associated_enums_from_keys(self, key : Keys) -> Enum:
+        if key == self.Keys.command_type:
+            return self.Commands
+        
+        return None
+
     @classmethod
     def get_value_using_key(self, msg, key):
-        if (ret := self.get_enum_using_key(msg, key)) != None:
-            return ret.value
-        return None      
-    
+        if (key in msg):
+            return msg[key]
+        return None
+
+    # Returns None if the key is not in msg, or if the value gotten back is not valid (i.e not does not exist inside the relevant enum)
+    # Return
     @classmethod
-    def get_enum_using_key(self, msg, key):
+    def get_enum_using_key(self, msg, key: Keys):
         ret = None
         if key in msg:
-            if msg[key] in self.Commands._value2member_map_:
-                ret = self.Commands(msg[key])
+            # use the key to get the value from the message, then check if the value is actually valid against all of the defined values in the enum
+            raw_value = msg[key]
+            if (all_possible_values := self.get_associated_enums_from_keys(key)) is not None:       
+                if raw_value in all_possible_values._value2member_map_:
+                    ret = all_possible_values(raw_value)
+                else:
+                    print("not valid " + key.name + " does not have associated enum of value " + str(raw_value))
         return ret
-    
+
     @classmethod
     def key_in_msg(self, msg, key) -> bool:
-        return (self.get_enum_using_key(msg, key) != None)
+        return (key in msg)
     
     @classmethod
     def get_command_enum(self, msg):
         return self.get_enum_using_key(msg, self.Keys.command_type) 
-    
-    @classmethod
-    def value_is(self, msg, key1, key2):
-            return self.get_enum_using_key(msg,key1) == key2
-        
