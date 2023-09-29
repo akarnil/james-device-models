@@ -80,21 +80,22 @@ class demo_edge_device(ConnectedDevice):
         OtaHandler(self,msg)
 
     def send_ack(self, data, status: api.AckStat, message, child_id = None):
-        key = api.Keys.ack.value
-        self.SdkClient.sendAckCmd(data[key],status.value,message, child_id)
+        key_str = self.api_enums.Keys.ack.value
+        status_int = status.value
+        self.SdkClient.sendAckCmd(data[key_str], status_int ,message, child_id)
 
-    # def send_ack_if_needed(self,msg):
+    def send_ack_if_needed(self, msg, status: api.AckStat, message, child_id = None):
+
+        # check if ack exists in message 
+        if not self.api_enums.key_in_msg(msg, self.api_enums.Keys.ack):
+            print(" Ack not requested, returning")
+            return
         
-    #     if "ack" i n 
-    #         if msg['ack'] == "True":
-    #     print_msg("ack message", msg)
-    #     d2c_msg = {
-    #         "ackId": msg["ackId"],
-    #         "st": status,
-    #         "msg": "",
-    #         "childId": ""
-    #     }
-    #     self.SdkClient.SendACK(d2c_msg, 5)  # 5 : command acknowledgement
+        id_to_send = None
+        if child_id is not None:
+            id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
+        self.send_ack(msg, status, message, id_to_send)
+
 
     def device_cb(self,msg):
         print("device callback received")
