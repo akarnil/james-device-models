@@ -77,23 +77,6 @@ class demo_edge_device(ConnectedDevice):
     def ota_cb(self,msg):
         OtaHandler(self,msg)
 
-    def send_ack(self, data, status: e.Values.AckStat, message, child_id = None):
-        key_str = e.Keys.ack.value
-        status_int = status.value
-        self.SdkClient.sendAckCmd(data[key_str], status_int ,message, child_id)
-    
-    def send_ack_if_needed(self, msg, status: e.Values.AckStat, message):
-
-        # check if ack exists in message 
-        if not e.key_in_msg(msg, e.Keys.ack):
-            print(" Ack not requested, returning")
-            return
-        
-        id_to_send = e.get_value_using_key(msg, e.Keys.id)
-        self.send_ack(msg, status, message, id_to_send)
-
-
-
 
     def device_cb(self,msg):
         print("device callback received")
@@ -103,7 +86,7 @@ class demo_edge_device(ConnectedDevice):
             
             if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
-                self.send_ack_generic(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
+                self.send_ack(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
             if command_type == e.Values.Commands.is_connect:

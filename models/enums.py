@@ -112,8 +112,8 @@ class Enums:
         return ret 
 
     @classmethod
-    def key_in_msg(msg, key) -> bool:
-        return (key in msg)
+    def key_in_msg(self, msg, key: Keys) -> bool:
+        return (key.value in msg)
     
     @classmethod
     def get_command_type(self, msg) -> Union[Enum, None]:
