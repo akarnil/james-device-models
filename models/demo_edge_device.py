@@ -22,7 +22,7 @@ from models.ota_handler import OtaHandler
 
 class demo_edge_device(ConnectedDevice):
     api_ver = 2.1
-    needs_exit:bool = False
+    
 
     template = "wkjb220907"
     # Min, Max, Sum, Average, Latest Value
@@ -61,7 +61,7 @@ class demo_edge_device(ConnectedDevice):
     
     
     def ota_cb(self,msg):
-        OtaHandler(self.SdkClient,msg)
+        OtaHandler(self,msg)
 
     def send_ack(self, data, status, message, child_id = None):
         key = api.Keys.ack.value

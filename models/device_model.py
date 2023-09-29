@@ -66,6 +66,8 @@ class ConnectedDevice(GenericDevice):
     api_ver = 2.1
     api_enums = api21
 
+    needs_exit:bool = False
+
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
         self.company_id = company_id

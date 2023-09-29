@@ -1,23 +1,23 @@
 from models.api import api21 as api
 from app_paths import app_paths
-from iotconnect import IoTConnectSDK
 import json
 import os
 import tarfile
 import shutil
-from urllib.request import urlretrieve 
+from urllib.request import urlretrieve
+from models.device_model import ConnectedDevice
 
 class OtaHandler:
 
-    SdkClient: IoTConnectSDK = None
+    parent_device: ConnectedDevice = None
 
-    def __init__(self, SdkClient: IoTConnectSDK, msg):
-        self.SdkClient = SdkClient
+    def __init__(self, parent_device: ConnectedDevice, msg):
+        self.parent_device = parent_device
         self.ota_perform_update(msg)
 
     def send_ota_ack(self, data, status:api.OtaStat, message):
         key = api.Keys.ack
-        self.SdkClient.sendOTAAckCmd(data[key],status.value,message)
+        self.parent_device.SdkClient.sendOTAAckCmd(data[key],status.value,message)
     
     def ota_perform_update(self,msg):
 
@@ -49,18 +49,18 @@ class OtaHandler:
                 raise
             self.send_ota_ack(data, api.OtaStat.DL_DONE, "payload downloaded")
             
-            self.needs_exit = False
+            self.parent_device.needs_exit  = False
             self.ota_backup_primary()
             try:
                 self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
-                self.needs_exit = True
+                self.parent_device.needs_exit  = True
             except:
                 self.ota_restore_primary()
                 self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED to install")
-                self.needs_exit = False
+                self.parent_device.needs_exit  = False
                 raise
 
-            if self.needs_exit:
+            if self.parent_device.needs_exit :
                 self.ota_delete_primary_backup()
                 self.send_ota_ack(data, api.OtaStat.SUCCESS, "OTA SUCCESS")
                 return
