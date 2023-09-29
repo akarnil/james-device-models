@@ -19,21 +19,24 @@ def whoami():
 from models.api import api21 as api
 from models.ota_handler import OtaHandler
 
+import random
+from datetime import datetime
+
 
 class demo_edge_device(ConnectedDevice):
     api_ver = 2.1
-    
-
     template = "wkjb220907"
-    # Min, Max, Sum, Average, Latest Value
-    # attributes
-    level = 0
-    power = 0
 
-    # twin properties
-    sw_version = "5.5"
-    upTime = 0
-    twin = ""
+    #sensor data
+    time1 = "11:55:22"
+    bit1 = 1
+    string1 = "red"
+    temperature = None
+    long1 = None
+    integer1 = None
+    decimal1 = None
+    date1 = None
+    datetime1 = None
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
@@ -41,6 +44,29 @@ class demo_edge_device(ConnectedDevice):
     def connect(self):
         super().connect()
 #        self.SdkClient.regiter_directmethod_callback("emergency", self.emergency_cb)
+
+    def update(self):
+        self.temperature = random.randint(30, 50)
+        self.long1 = random.randint(6000, 9000)
+        self.integer1 = random.randint(100, 200)
+        self.decimal1 = random.uniform(10.5, 75.5)
+        self.date1 = datetime.utcnow().strftime("%Y-%m-%d")
+        self.datetime1 = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+    def get_state(self):
+        # returns the current state of device
+        data_obj = {
+            "temperature": self.temperature,
+            "long1": self.long1,
+            "integer1": self.integer1,
+            "decimal1": self.decimal1,
+            "date1": self.date1,
+            "time1": self.time1,
+            "bit1": self.bit1,
+            "string1": self.string1,
+            "datetime1": self.datetime1
+        }
+        return data_obj
 
 
     def emergency_cb(self, msg, request_id):
