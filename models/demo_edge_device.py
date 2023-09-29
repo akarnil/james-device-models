@@ -9,6 +9,7 @@ from iotconnect import IoTConnectSDK as SdkClient
 
 import json
 
+from enum import Enum
 from models.enums import Enums as e
 
 def whoami():
@@ -35,6 +36,10 @@ class demo_edge_device(ConnectedDevice):
     decimal1 = None
     date1 = None
     datetime1 = None
+
+    class DeviceCommands(str, Enum):
+        ECHO = "echo "
+        LED = "led "
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
@@ -86,6 +91,7 @@ class demo_edge_device(ConnectedDevice):
             
             if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
+                self.device_command(msg)
                 self.send_ack(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
@@ -100,6 +106,9 @@ class demo_edge_device(ConnectedDevice):
         print("rule command",msg)
 
     def device_command(self, msg):
+        command = e.get_value_using_key(msg, e.Keys.device_command)
+        print(command)
+        return
         command = msg['command'].split(' ')
         if command[0] == "setPower":
             self.power = int(command[1])  # == '1')

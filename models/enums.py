@@ -9,6 +9,7 @@ class Enums:
         ack = 'ack'
         command_type = 'ct'
         id = 'id'
+        device_command = 'cmd'
 
     class Values:
         # 2.1 enums
