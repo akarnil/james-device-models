@@ -10,14 +10,7 @@ import os
 import sys
 
 
-unique_id = "linuxPythonDemo"
-sdk_id = "Yjg5MmMzNThlMzc1NGNjMzg4NDEzMmUyNzFlMjYxNTE=UDI6MDM6NzAuMTQ="
-company_id = 'avtds'
-environment = 'avnetpoc'
-sdk_options = {
-    "devicePrimaryKey":"MWRjP0I1fWQmPEU7XWl5VmhWcnlWTj9VSTxJ"
-}
-
+from creds import *
 
 def main():
     device = demo_edge_device(company_id, unique_id, environment, sdk_id, sdk_options)

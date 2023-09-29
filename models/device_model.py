@@ -204,6 +204,22 @@ class ConnectedDevice(GenericDevice):
     def twin_update_cb(self, msg):
         print_msg("twin update CB on {} template {}".format(self.unique_id, self.template), msg)
 
+    def send_ack_generic(self, msg, status: e.Values.AckStat, message):
+        # check if ack exists in message 
+        if not e.key_in_msg(msg, e.Keys.ack):
+            print(" Ack not requested, returning")
+            return
+        
+        id_to_send = e.get_value_using_key(msg, e.Keys.id)
+        key_str = e.Keys.ack.value
+        status_int = status.value
+
+        if status.__class__ == e.Values.AckStat:
+            self.SdkClient.sendAckCmd(msg[key_str], status_int ,message, id_to_send)
+        
+        if status.__class__ == e.Values.OtaStat:
+            self.SdkClient.sendOTAAckCmd(msg[key_str],status_int,message, id_to_send)
+
 class Gateway(ConnectedDevice):
     children = []
 

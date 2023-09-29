@@ -81,7 +81,7 @@ class demo_edge_device(ConnectedDevice):
         key_str = e.Keys.ack.value
         status_int = status.value
         self.SdkClient.sendAckCmd(data[key_str], status_int ,message, child_id)
-
+    
     def send_ack_if_needed(self, msg, status: e.Values.AckStat, message):
 
         # check if ack exists in message 
@@ -93,6 +93,8 @@ class demo_edge_device(ConnectedDevice):
         self.send_ack(msg, status, message, id_to_send)
 
 
+
+
     def device_cb(self,msg):
         print("device callback received")
 
@@ -101,7 +103,7 @@ class demo_edge_device(ConnectedDevice):
             
             if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
-                self.send_ack_if_needed(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
+                self.send_ack_generic(msg,e.Values.AckStat.SUCCESS, "Got DCOMM command successfully")
                 
 
             if command_type == e.Values.Commands.is_connect:
