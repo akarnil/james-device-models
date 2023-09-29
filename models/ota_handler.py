@@ -7,21 +7,23 @@ import shutil
 from urllib.request import urlretrieve
 from models.device_model import ConnectedDevice
 
+
 class OtaHandler:
+    d: ConnectedDevice = None
+    e: api = None
 
-    parent_device: ConnectedDevice = None
-
-    def __init__(self, parent_device: ConnectedDevice, msg):
-        self.parent_device = parent_device
+    def __init__(self, connected_device: ConnectedDevice, msg):
+        self.d = connected_device
+        self.e = self.d.api_enums
         self.ota_perform_update(msg)
 
     def send_ota_ack(self, data, status:api.OtaStat, message):
-        key = api.Keys.ack
-        self.parent_device.SdkClient.sendOTAAckCmd(data[key],status.value,message)
+        key = self.e.Keys.ack
+        self.d.SdkClient.sendOTAAckCmd(data[key],status.value,message)
+        
     
     def ota_perform_update(self,msg):
-
-        if api.get_enum_from_key(msg,api.Keys.command_type) != api.Commands.FIRMWARE:
+        if self.e.get_enum_from_key(msg, self.e.Keys.command_type) != self.e.Commands.FIRMWARE:
             print("fail wrong command type")
             return  
         
@@ -42,32 +44,33 @@ class OtaHandler:
             if os.path.exists(final_folder_dest) == False:
                 os.mkdir(final_folder_dest)
             try:
-                self.send_ota_ack(data, api.OtaStat.DL_IN_PROGRESS, "downloading payload")
+                self.send_ota_ack(data, self.e.OtaStat.DL_IN_PROGRESS, "downloading payload")
                 urlretrieve(url, final_folder_dest + download_filename)
             except:
-                self.send_ota_ack(data, api.OtaStat.DL_FAILED, "payload dl failed")
+                self.send_ota_ack(data, self.e.OtaStat.DL_FAILED, "payload dl failed")
                 raise
-            self.send_ota_ack(data, api.OtaStat.DL_DONE, "payload downloaded")
+            self.send_ota_ack(data, self.e.OtaStat.DL_DONE, "payload downloaded")
             
-            self.parent_device.needs_exit  = False
+            self.d.needs_exit  = False
             self.ota_backup_primary()
             try:
                 self.ota_extract_to_a_and_move_old_a_to_b(download_filename)
-                self.parent_device.needs_exit  = True
+                self.d.needs_exit  = True
             except:
                 self.ota_restore_primary()
-                self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED to install")
-                self.parent_device.needs_exit  = False
+                self.send_ota_ack(data, self.e.OtaStat.FAILED, "OTA FAILED to install")
+                self.d.needs_exit  = False
                 raise
 
-            if self.parent_device.needs_exit :
+            if self.d.needs_exit:
                 self.ota_delete_primary_backup()
-                self.send_ota_ack(data, api.OtaStat.SUCCESS, "OTA SUCCESS")
+                self.send_ota_ack(data, self.e.OtaStat.SUCCESS, "OTA SUCCESS")
                 return
             
-        self.send_ota_ack(data, api.OtaStat.FAILED, "OTA FAILED,invalid payload")
+        self.send_ota_ack(data, self.e.OtaStat.FAILED, "OTA FAILED,invalid payload")
 
-    def ota_extract_to_a_and_move_old_a_to_b(self,tarball_name:str):
+    @staticmethod
+    def ota_extract_to_a_and_move_old_a_to_b(tarball_name:str):
         # extract tarball to new directory
         file = tarfile.open(app_paths["main_dir"] + app_paths["tarball_download_dir"] + tarball_name)
         file.extractall(app_paths["main_dir"] + app_paths["tarball_extract_dir"])
@@ -89,14 +92,17 @@ class OtaHandler:
         shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_download_dir"], ignore_errors=True)
         shutil.rmtree(app_paths["main_dir"] + app_paths["tarball_extract_dir"], ignore_errors=True)
 
-    def ota_backup_primary(self):
+    @staticmethod
+    def ota_backup_primary():
         src = app_paths["main_dir"] + app_paths["primary_app_dir"]
         dst = app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"]
         shutil.copytree(src, dst)
 
-    def ota_restore_primary(self):
+    @staticmethod
+    def ota_restore_primary():
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_dir"], ignore_errors=True)
         os.rename(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], app_paths["main_dir"] + app_paths["primary_app_dir"])
 
-    def ota_delete_primary_backup(self):
+    @staticmethod
+    def ota_delete_primary_backup():
         shutil.rmtree(app_paths["main_dir"] + app_paths["primary_app_backup_folder_name"], ignore_errors=True)
