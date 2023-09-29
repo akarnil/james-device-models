@@ -3,18 +3,7 @@ import os
 import sys
 from importlib import import_module, reload
 
-# import both so the ota logic is bound to the SDK's ota handler, any files using IoTConnectSDK will now call the logic from ota during OTA events
-# import_path = "/home/akarnil/Documents/Work/iotc-yocto-python-sdk/meta-my-iotc-python-sdk-example/recipes-apps/iotc-python-sdk/files/"
-# sys.path.append(import_path)
-# from iotconnect import IoTConnectSDK
-# import ota
-
 from app_paths import app_paths
-app_name = app_paths["app_name"]
-module_name = app_paths["module_name"]
-main_dir = app_paths["main_dir"]
-primary_app_dir = app_paths["primary_app_dir"]
-secondary_app_dir = app_paths["secondary_app_dir"]
 
 # this the runner of the demo, used to show A/B updates
 # the actual code lives inside a folder called `primary_app_dir`
@@ -24,8 +13,12 @@ secondary_app_dir = app_paths["secondary_app_dir"]
 # OTA payload must be a single file of file extension .tar.gz
 # the updated application .py file  must be called the same as a previous version otherwise it will not load, refer to app_name
 
-
-
+# Modify in app_paths.py
+app_name = app_paths["app_name"]
+module_name = app_paths["module_name"]
+main_dir = app_paths["main_dir"]
+primary_app_dir = app_paths["primary_app_dir"]
+secondary_app_dir = app_paths["secondary_app_dir"]
 
 def run_app(to_run_path: str):
     try:
