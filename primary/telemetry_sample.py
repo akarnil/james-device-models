@@ -35,7 +35,7 @@ def main():
         print("sending data")  # , data_sent)
         device.send_device_states()
         
-        time.sleep(30)
+        time.sleep(10)
 
 
     print("APP EXIT")
