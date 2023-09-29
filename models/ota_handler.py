@@ -23,7 +23,7 @@ class OtaHandler:
         
     
     def ota_perform_update(self,msg):
-        if self.e.get_enum_from_key(msg, self.e.Keys.command_type) != self.e.Commands.FIRMWARE:
+        if self.e.get_enum_using_key(msg, self.e.Keys.command_type) != self.e.Commands.FIRMWARE:
             print("fail wrong command type")
             return  
         

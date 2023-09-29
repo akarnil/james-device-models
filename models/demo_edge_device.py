@@ -101,7 +101,7 @@ class demo_edge_device(ConnectedDevice):
 
         
         if (command_type := self.api_enums.get_command_enum(msg)) != None:      
-            child_id_to_send = self.api_enums.get_value_from_key(msg, api.Keys.id)
+            child_id_to_send = self.api_enums.get_value_using_key(msg, api.Keys.id)
             
             if command_type == self.api_enums.Commands.DCOMM:
                 # do something cool here
