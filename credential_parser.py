@@ -6,8 +6,7 @@ from models.device_model import ConnectedDevice
 path_to_json = "credentials.json"
 
 
-class sdk_options_children:
-
+class sdk_options:
     class certificate:
         name:str = "certificate"
         class children:
@@ -92,12 +91,12 @@ def parse_device(j: json):
 
     child: dict[str] = {}
     if (offline_storage_o := get(device_o, device.offline_storage.name)) is not None:
-        child[sdk_options_children.offline_storage.children.disabled] = False
-        get_and_assign(offline_storage_o,child, device.offline_storage.children.available_space, sdk_options_children.offline_storage.children.available_space)
-        get_and_assign(offline_storage_o,child, device.offline_storage.children.file_count, sdk_options_children.offline_storage.children.file_count)
+        child[sdk_options.offline_storage.children.disabled] = False
+        get_and_assign(offline_storage_o,child, device.offline_storage.children.available_space, sdk_options.offline_storage.children.available_space)
+        get_and_assign(offline_storage_o,child, device.offline_storage.children.file_count, sdk_options.offline_storage.children.file_count)
     else:
-        child[sdk_options_children.offline_storage.children.disabled] = True
-    temp[sdk_options_children.offline_storage.name] = child
+        child[sdk_options.offline_storage.children.disabled] = True
+    temp[sdk_options.offline_storage.name] = child
 
 
 
@@ -126,7 +125,7 @@ def parse_auth(j: json):
     #
     # 	"devicePrimaryKey" : "a"
 
-        get_and_assign(params_o,temp, auth.symmetric.children.primary_key, sdk_options_children.symmetric_primary_key)
+        get_and_assign(params_o,temp, auth.symmetric.children.primary_key, sdk_options.symmetric_primary_key)
         
     elif auth_type == auth.x509.name:
     # from json
@@ -149,10 +148,10 @@ def parse_auth(j: json):
     # 	},
 
         child: dict[str] = {}
-        get_and_assign(params_o,child, auth.x509.children.client_key, sdk_options_children.certificate.children.key_path)
-        get_and_assign(params_o,child, auth.x509.children.client_cert, sdk_options_children.certificate.children.cert_path)
-        get_and_assign(params_o,child, auth.x509.children.root_cert, sdk_options_children.certificate.children.root_cert_path)
-        temp[sdk_options_children.certificate.name] = child
+        get_and_assign(params_o,child, auth.x509.children.client_key, sdk_options.certificate.children.key_path)
+        get_and_assign(params_o,child, auth.x509.children.client_cert, sdk_options.certificate.children.cert_path)
+        get_and_assign(params_o,child, auth.x509.children.root_cert, sdk_options.certificate.children.root_cert_path)
+        temp[sdk_options.certificate.name] = child
         
 
     return temp
