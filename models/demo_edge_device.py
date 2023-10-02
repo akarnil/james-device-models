@@ -2,7 +2,6 @@ import requests
 
 from models.device_model import ConnectedDevice
 
-
 import sys
 sys.path.append("iotconnect")
 from iotconnect import IoTConnectSDK as SdkClient
@@ -45,6 +44,9 @@ class demo_edge_device(ConnectedDevice):
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
+
+    def __init__(self, credentials):
+        super().__init__(credentials["company_id"], credentials["unique_id"], credentials["environment"], credentials["sdk_id"], credentials["sdk_options"])
 
     def connect(self):
         super().connect()

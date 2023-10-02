@@ -10,10 +10,13 @@ import os
 import sys
 
 
-from creds import *
+from credential_parser import parse_json_for_config
+
+credentials_path = "credentials.json"
 
 def main():
-    device = demo_edge_device(company_id, unique_id, environment, sdk_id, sdk_options)
+    credentials = parse_json_for_config(credentials_path)
+    device = demo_edge_device(credentials)
     device.connect()
 
     # # uncomment if you want an ota call without using the endpoint, will fail during the process but it allows most of it to execute
