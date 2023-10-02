@@ -55,6 +55,7 @@ class auth(Enum):
         class children(Enum):
             client_key:str = "client_key"
             client_cert:str = "client_cert"
+            root_cert:str = "root_cert"
 
     class symmetric(Enum):
         name: str = "symmetric"
@@ -107,6 +108,10 @@ def parse_json_for_config(path_to_json) -> dict:
 
     return credentials
 
+def get_and_assign(from_json, to_obj , from_key, to_key):
+    if (temp := get(from_json, from_key)) is not None:
+            to_obj[to_key.value] = temp
+        
 
 def parse_auth(j: json):
     temp: dict[str] = {}
@@ -116,16 +121,50 @@ def parse_auth(j: json):
     params_o = get(auth_o, auth.params) # need to fetch child object for get() to work with nested enums
 
     if auth_type == auth.symmetric.name:
-        primary_key = get(params_o, auth.symmetric.children.primary_key)
+    # from jon
+    #
+    #     "auth": {
+    #     "type": "symmetric",
+    #     "params": {
+    #         "primary_key": "a"
+    #     }
+    # },
 
-        temp[sdk_options_children.symmetric_primary_key.value] = primary_key
+    # to sdj
+    #
+    # 	"devicePrimaryKey" : "a"
+
+        get_and_assign(params_o,temp, auth.symmetric.children.primary_key, sdk_options_children.symmetric_primary_key)
         
     elif auth_type == auth.x509.name:
-        client_key = get(params_o, auth.x509.children.client_key)
-        client_cert = get(params_o, auth.x509.children.client_cert)
+    # from json
+    
+    #     "auth": {
+    #     "type": "x509",
+    #     "params": {
+    #         "client_key": "a",
+    #         "client_cert": "b",
+    #         "root_cert": "c"
+    #     }
+    # },
+
+    # to sdk
+    #
+    # 	"certificate" : { 
+    # 		"SSLKeyPath"  : "a",
+    # 		"SSLCertPath" : "b",
+    # 		"SSLCaPath"   : "c"    
+    # 	},
+
+        child: dict[str] = {}
+        get_and_assign(params_o,child, auth.x509.children.client_key, sdk_options_children.certificate.children.key_path)
+        get_and_assign(params_o,child, auth.x509.children.client_cert, sdk_options_children.certificate.children.cert_path)
+        get_and_assign(params_o,child, auth.x509.children.root_cert, sdk_options_children.certificate.children.root_cert_path)
+        temp[sdk_options_children.certificate.name] = child
         
 
     return temp
+
 
 
 credentials: dict = {
