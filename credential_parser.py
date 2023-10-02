@@ -112,9 +112,8 @@ def parse_device(j: json):
     temp: dict[str] = {}
     device_o = get(j, k.device)
 
-    offline_storage_o = get(device_o, device.offline_storage.name)
     child: dict[str] = {}
-    if offline_storage_o is not None:
+    if (offline_storage_o := get(device_o, device.offline_storage.name)) is not None:
         child[sdk_options_children.offline_storage.children.disabled] = False
         get_and_assign(offline_storage_o,child, device.offline_storage.children.available_space, sdk_options_children.offline_storage.children.available_space)
         get_and_assign(offline_storage_o,child, device.offline_storage.children.file_count, sdk_options_children.offline_storage.children.file_count)
