@@ -24,7 +24,6 @@ from typing import Union # to use Union[Enum, None] type hint
 
 
 class demo_edge_device(ConnectedDevice):
-    api_ver = 2.1
     template = "wkjb220907"
 
     #sensor data
@@ -47,6 +46,7 @@ class demo_edge_device(ConnectedDevice):
 
     def __init__(self, credentials):
         super().__init__(credentials["company_id"], credentials["unique_id"], credentials["environment"], credentials["sdk_id"], credentials["sdk_options"])
+        self.api_ver = credentials["message_version"]
 
     def connect(self):
         super().connect()

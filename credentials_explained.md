@@ -1,6 +1,7 @@
 Example `.json` that uses offline storage and symmetric key authentication 
 ```json
 {
+    "message_version": 2.1,
     "duid": "afkPythonDemo",
     "cpid": "avtds",
     "env": "avnetpoc",
@@ -26,6 +27,7 @@ Example `.json` that uses offline storage and symmetric key authentication
     }
 }
 ```
+* `"message_version": "<>"` The message version of the SDK used currently only `2.1` supported
 
 * `"duid": "<>"` The device's unique id
 
