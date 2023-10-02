@@ -7,7 +7,7 @@ sys.path.append("iotconnect")
 sys.path.append("/home/akarnil/Documents/Work/james-device-models/")
 
 # remove for release
-from iotconnect import IoTConnectSDK
+from iotconnect21 import IoTConnectSDK
 
 from models.enums import Enums as e
 

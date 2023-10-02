@@ -4,7 +4,7 @@ from models.device_model import ConnectedDevice
 
 import sys
 sys.path.append("iotconnect")
-from iotconnect import IoTConnectSDK as SdkClient
+from iotconnect21 import IoTConnectSDK as SdkClient
 
 import json
 
