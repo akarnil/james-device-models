@@ -5,7 +5,7 @@ import math
 import time
 import threading
 from threading import Timer
-from iotconnect21.IoTConnectSDKException import IoTConnectSDKException
+from iotconnect.IoTConnectSDKException import IoTConnectSDKException
 import shutil
 
 class offlineclient:

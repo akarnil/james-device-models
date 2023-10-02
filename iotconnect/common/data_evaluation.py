@@ -3,8 +3,8 @@ import string
 from datetime import datetime
 import json
 
-from iotconnect21.common.infinite_timer import infinite_timer
-from iotconnect21.IoTConnectSDKException import IoTConnectSDKException
+from iotconnect.common.infinite_timer import infinite_timer
+from iotconnect.IoTConnectSDKException import IoTConnectSDKException
 
 aggrigate_type = [
     { "name": "min", "value": 1 },
