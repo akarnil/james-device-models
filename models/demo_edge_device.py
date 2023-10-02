@@ -37,9 +37,9 @@ class demo_edge_device(ConnectedDevice):
     date1 = None
     datetime1 = None
 
-    class DeviceCommands(str, Enum):
-        ECHO = "echo "
-        LED = "led "
+    class DeviceCommands(Enum):
+        ECHO:str = "echo "
+        LED:str = "led "
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
@@ -108,20 +108,21 @@ class demo_edge_device(ConnectedDevice):
         print("callback received not valid")
         print("rule command",msg)
 
-    def get_device_command(self, msg) -> Union[Enum, None]:
+    def get_device_command(self, full_command:str) -> Union[Enum, None]:
         command_enum = None
-        if (full_command := e.get_value_using_key(msg, e.Keys.device_command)) is not None:
-            for mem in self.DeviceCommands._value2member_map_:
-                if (command_sliced := full_command[:len(mem)]) == mem:
-                    command_enum = self.DeviceCommands(command_sliced)
+        if full_command is not None:
+            for dc in self.DeviceCommands:
+                dc = dc.value
+                if (sliced := full_command[:len(dc)]) == dc:
+                    command_enum = self.DeviceCommands(sliced)
                     break
         return command_enum
 
     def device_command(self, msg):
-        command_enum = self.get_device_command(msg)
+        full_command = e.get_value_using_key(msg, e.Keys.device_command)
+        command_enum = self.get_device_command(full_command)
 
         if command_enum == self.DeviceCommands.ECHO:
-            full_command = e.get_value_using_key(msg, e.Keys.device_command)
             to_print = full_command[len(self.DeviceCommands.ECHO.value):]
             print(to_print)
             self.send_ack(msg,e.Values.AckStat.SUCCESS, "Command Executed Successfully")
