@@ -23,16 +23,16 @@ else:
     import urllib2 as urllib
     from urlparse import urlparse
 
-from iotconnect.client.mqttclient import mqttclient
-from iotconnect.client.httpclient import httpclient
-from iotconnect.client.offlineclient import offlineclient
+from iotconnect21.client.mqttclient import mqttclient
+from iotconnect21.client.httpclient import httpclient
+from iotconnect21.client.offlineclient import offlineclient
 
-from iotconnect.common.data_evaluation import data_evaluation
-from iotconnect.common.rule_evaluation import rule_evaluation
+from iotconnect21.common.data_evaluation import data_evaluation
+from iotconnect21.common.rule_evaluation import rule_evaluation
 
-from iotconnect.common.infinite_timer import infinite_timer
+from iotconnect21.common.infinite_timer import infinite_timer
 
-from iotconnect.IoTConnectSDKException import IoTConnectSDKException
+from iotconnect21.IoTConnectSDKException import IoTConnectSDKException
 
 MSGTYPE = {
     "RPT": 0,
