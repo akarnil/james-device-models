@@ -5,67 +5,63 @@ from models.device_model import ConnectedDevice
 
 path_to_json = "credentials.json"
 
-# Enum overrides
-def enum__str__(self):
-        return str(self.value)
-Enum.__str__ = enum__str__
 
-def enum__getattr__(self, item):
-    if item != '_value_':
-        return getattr(self.value, item)
-    raise AttributeError
-Enum.__getattr__ = enum__getattr__
+class sdk_options_children:
 
-def tV(enum: Enum) -> str:
-    return enum.value
-
-
-class sdk_options_children(Enum):
-
-    class certificate(Enum):
+    class certificate:
         name:str = "certificate"
-        class children(Enum):
+        class children:
             key_path:str = "SSLKeyPath"
             cert_path: str = "SSLCertPath"
             root_cert_path: str = "SSLCaPath"
     
-    class offline_storage(Enum):
+    class offline_storage:
         name:str = "offlineStorage"
-        class children(Enum):
+        class children:
             disabled:str = "disabled"
-            space_megabytes: str = "availSpaceInMb"
+            available_space: str = "availSpaceInMb"
             file_count: str = "fileCount"
 
     symmetric_primary_key: str = "devicePrimaryKey"
 
 
-class k(Enum):
+class k:
     unique_id:str = "duid"
     company_id:str = "cpid"
     environment:str = "env"
     auth:str = "auth"
     sdk_id:str = "sdk_id"
+    device:str = "device"
 
-class auth(Enum):
+class auth:
     type: str = "type"
     params: str = "params"
 
-    class x509(Enum):
-        name: str = "x509"
-        class children(Enum):
+    class x509:
+        name:str = "x509"
+        class children:
             client_key:str = "client_key"
             client_cert:str = "client_cert"
             root_cert:str = "root_cert"
 
-    class symmetric(Enum):
-        name: str = "symmetric"
-        class children(Enum):
+    class symmetric:
+        name:str = "symmetric"
+        class children:
             primary_key:str = "primary_key"
         
 
-def get(json, key: Enum):
-    if key.value in json:
-        return json[key.value]
+class device:
+    class offline_storage:
+        name:str = "offline_storage"
+        class children:
+            available_space:str = "available_space_MB"
+            file_count:str = "file_count"
+
+def get(json, key):
+    if not isinstance(key,str):
+        key = key.__name__
+    if key in json:
+        return json[key]
     return None
 
 # sample stuff
@@ -103,15 +99,34 @@ def parse_json_for_config(path_to_json) -> dict:
     sdk_options: dict[str] = {}
     sdk_options.update(parse_auth(j))
 
+    sdk_options.update(parse_device(j))
+
     credentials["sdk_options"] = sdk_options
-
-
     return credentials
 
 def get_and_assign(from_json, to_obj , from_key, to_key):
     if (temp := get(from_json, from_key)) is not None:
-            to_obj[to_key.value] = temp
-        
+            to_obj[to_key] = temp
+
+def parse_device(j: json):
+    temp: dict[str] = {}
+    device_o = get(j, k.device)
+
+    offline_storage_o = get(device_o, device.offline_storage.name)
+    child: dict[str] = {}
+    if offline_storage_o is not None:
+        child[sdk_options_children.offline_storage.children.disabled] = False
+        get_and_assign(offline_storage_o,child, device.offline_storage.children.available_space, sdk_options_children.offline_storage.children.available_space)
+        get_and_assign(offline_storage_o,child, device.offline_storage.children.file_count, sdk_options_children.offline_storage.children.file_count)
+    else:
+        child[sdk_options_children.offline_storage.children.disabled] = True
+    temp[sdk_options_children.offline_storage.name] = child
+
+
+
+    return temp
+
+
 
 def parse_auth(j: json):
     temp: dict[str] = {}
