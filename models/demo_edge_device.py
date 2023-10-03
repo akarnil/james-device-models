@@ -91,12 +91,10 @@ class demo_edge_device(ConnectedDevice):
         print("device callback received")
 
         # check command type got from message
-        if (command_type := e.get_command_type(msg)) != None:      
-            
+        if (command_type := e.get_command_type(msg)) is not None:
             if command_type == e.Values.Commands.DCOMM:
                 # do something cool here
                 self.device_command(msg)
-                
 
             if command_type == e.Values.Commands.is_connect:
                 print("connection status is " + msg["command"])
