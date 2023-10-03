@@ -1,5 +1,6 @@
-from app_paths import app_paths
-import json
+'''
+    Module handling OTA update functionality
+'''
 import os
 import tarfile
 import shutil
@@ -7,35 +8,38 @@ from urllib.request import urlretrieve
 from models.device_model import ConnectedDevice
 
 from models.enums import Enums as e
+from app_paths import app_paths
+
 
 
 class OtaHandler:
+    '''Class for handling OTA'''
     d: ConnectedDevice = None
 
     def __init__(self, connected_device: ConnectedDevice, msg):
         self.d = connected_device
         self.ota_perform_update(msg)
-    
+
     def ota_perform_update(self,msg):
         if e.get_command_type(msg) != e.Values.Commands.FIRMWARE:
             print("fail wrong command type")
-            return  
-        
+            return
+
         payload_valid: bool = False
         data: dict = msg
-        
-        if ("urls" in data) and len(data["urls"]) == 1:                
+
+        if ("urls" in data) and len(data["urls"]) == 1:
             if ("url" in data["urls"][0]) and ("fileName" in data["urls"][0]):
-                if (data["urls"][0]["fileName"].endswith(".gz")):
-                    payload_valid = True   
+                if data["urls"][0]["fileName"].endswith(".gz"):
+                    payload_valid = True
 
         if payload_valid is True:
-            urls = data["urls"][0]    
+            urls = data["urls"][0]
             # download tarball from url to download_dir
             url: str = urls["url"]
             download_filename: str = urls["fileName"]
             final_folder_dest:str = app_paths["main_dir"] + app_paths["tarball_download_dir"]
-            if os.path.exists(final_folder_dest) == False:
+            if not os.path.exists(final_folder_dest):
                 os.mkdir(final_folder_dest)
             try:
                 self.d.send_ack(data, e.Values.OtaStat.DL_IN_PROGRESS, "downloading payload")
@@ -44,7 +48,7 @@ class OtaHandler:
                 self.d.send_ack(data, e.Values.OtaStat.DL_FAILED, "payload dl failed")
                 raise
             self.d.send_ack(data, e.Values.OtaStat.DL_DONE, "payload downloaded")
-            
+
             self.d.needs_exit  = False
             self.ota_backup_primary()
             try:
@@ -60,7 +64,7 @@ class OtaHandler:
                 self.ota_delete_primary_backup()
                 self.d.send_ack(data, e.Values.OtaStat.SUCCESS, "OTA SUCCESS")
                 return
-            
+
         self.d.send_ack(data, e.Values.OtaStat.FAILED, "OTA FAILED,invalid payload")
 
     @staticmethod
