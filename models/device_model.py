@@ -116,7 +116,7 @@ class ConnectedDevice(GenericDevice):
         pass
 
     def init_cb(self, msg):
-        if e.get_command_type(msg) != e.Values.Commands.is_connect:
+        if e.get_command_type(msg) is e.Values.Commands.is_connect:
             print("connection status is " + msg["command"])
         
 
