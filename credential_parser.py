@@ -99,12 +99,22 @@ def get_and_assign(from_json, to_obj , from_key, to_key):
 
 def parse_device(j: json):
     """Parse device object from credential json, generate format needed for SDK"""
-    temp: dict[str] = {}
+
     device_o = get(j, Keys.device)
 
-    # Parse offline_storage parameters
+
+    temp: dict[str] = {}
+    temp.update(parse_device_offline_storage(device_o))
+
+
+    return temp
+
+def parse_device_offline_storage(j:json):
+    '''Parse offline_storage parameters'''
+    temp: dict[str] = {}
+
     child: dict[str] = {}
-    if (offline_storage_o := get(device_o, Device.OfflineStorage.name)) is not None:
+    if (offline_storage_o := get(j, Device.OfflineStorage.name)) is not None:
         child[SdkOptions.OfflineStorage.Children.disabled] = False
         get_and_assign(offline_storage_o,child, Device.OfflineStorage.Children.available_space, SdkOptions.OfflineStorage.Children.available_space)
         get_and_assign(offline_storage_o,child, Device.OfflineStorage.Children.file_count, SdkOptions.OfflineStorage.Children.file_count)
@@ -112,9 +122,9 @@ def parse_device(j: json):
         child[SdkOptions.OfflineStorage.Children.disabled] = True
     temp[SdkOptions.OfflineStorage.name] = child
 
-
-
     return temp
+
+
 
 
 
