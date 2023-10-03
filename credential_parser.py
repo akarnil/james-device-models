@@ -33,7 +33,7 @@ class Keys:
 
 class Auth:
     """Human readable Enum for to mapping credential's auth object json format, including subclasses"""
-    type: str = "type"
+    type: str = "auth_type"
     params: str = "params"
 
     class X509:
