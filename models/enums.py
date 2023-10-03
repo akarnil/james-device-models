@@ -87,35 +87,38 @@ class Enums:
             OBJECT = 11
 
     @classmethod
-    def enums_from_keys(self, key : Keys) -> Union[Enum, None]:
-        if key == self.Keys.command_type:
-            return self.Values.Commands
+    def enums_from_keys(cls, key : Keys) -> Union[Enum, None]:
+        if key == cls.Keys.command_type:
+            return cls.Values.Commands
         
         return None
 
     @classmethod
-    def get_value_using_key(self, msg, key) -> Union[str, None]:
+    def get_value_using_key(cls,msg, key) -> Union[str, None]:
         if (key in msg):
             return msg[key]
         return None
 
-    # Returns None if the key is not in msg, or if the value gotten back is not valid (i.e not does not exist inside the relevant enum)
-    # Return
-    @classmethod    
-    def get_enum_using_key(self, msg, key: Keys) -> Union[Enum, None]:
-        ret = None
-        if (value := self.get_value_using_key(msg,key)) is not None:
-            if (all_enums := self.enums_from_keys(key)) is not None:
-                if value in all_enums._value2member_map_:
-                    ret = all_enums(value)
-                else:
-                    print("not valid " + key.name + " does not have associated enum of value " + str(value))
-        return ret 
 
     @classmethod
-    def key_in_msg(self, msg, key: Keys) -> bool:
+    def get_enum_using_key(cls, msg, key: Keys) -> Union[Enum, None]:
+        '''
+            Checks if the value got from the message using the key is valid
+            if so then returns the associated Enum object with the value.
+            Returns None if not.
+        '''
+        if (value := cls.get_value_using_key(msg,key)) is not None:
+            if (all_enums := cls.enums_from_keys(key)) is not None:
+                for a_e in all_enums:
+                    if value == a_e.value:
+                        return a_e
+            print("not valid " + key.name + " does not have associated enum of value " + str(value))
+        return None
+
+    @classmethod
+    def key_in_msg(cls, msg, key: Keys) -> bool:
         return (key.value in msg)
     
     @classmethod
-    def get_command_type(self, msg) -> Union[Enum, None]:
-        return self.get_enum_using_key(msg, self.Keys.command_type) 
+    def get_command_type(cls, msg) -> Union[Enum, None]:
+        return cls.get_enum_using_key(msg, cls.Keys.command_type) 
