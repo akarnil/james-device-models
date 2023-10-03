@@ -1,5 +1,20 @@
 """Load a device json file from path and translate to format required for the SDK"""
 import json
+from enum import Enum, auto
+
+class Credentials(Enum):
+    """
+        Enum for credentials object to be passed to application
+        Used to build and access the dictionary object
+    """
+    sdk_ver = auto()
+    company_id = auto()
+    unique_id = auto()
+    environment = auto()
+    sdk_id = auto()
+    sdk_options = auto()
+    attributes = auto()
+
 
 
 class SdkOptions:
@@ -29,7 +44,7 @@ class Keys:
     auth:str = "auth"
     sdk_id:str = "sdk_id"
     device:str = "device"
-    message_version:str = "message_version"
+    sdk_ver:str = "sdk_ver"
 
 class Auth:
     """Human readable Enum for to mapping credential's auth object json format, including subclasses"""
@@ -79,14 +94,14 @@ def parse_json_for_config(path_to_json) -> dict:
     j = get_json_from_file(path_to_json)
 
     c: dict = {}
-    c["message_version"] = get(j, Keys.message_version)
-    c["company_id"] = get(j, Keys.company_id)
-    c["unique_id"] = get(j, Keys.unique_id)
-    c["environment"] = get(j, Keys.environment)
-    c["sdk_id"] = get(j, Keys.sdk_id)
+    c[Credentials.sdk_ver] = float(get(j, Keys.sdk_ver)) # Convert string to float
+    c[Credentials.company_id] = get(j, Keys.company_id)
+    c[Credentials.unique_id] = get(j, Keys.unique_id)
+    c[Credentials.environment] = get(j, Keys.environment)
+    c[Credentials.sdk_id] = get(j, Keys.sdk_id)
 
-    c["sdk_options"] = get_sdk_options(j)
-    c["attributes"] = parse_device_attributes(j)
+    c[Credentials.sdk_options] = get_sdk_options(j)
+    c[Credentials.attributes] = parse_device_attributes(j)
 
     return c
 

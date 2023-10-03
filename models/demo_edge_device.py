@@ -20,8 +20,7 @@ from models.ota_handler import OtaHandler
 import random
 from datetime import datetime
 from typing import Union # to use Union[Enum, None] type hint
-
-
+from credential_parser import Credentials as c
 
 class demo_edge_device(ConnectedDevice):
     attributes = []
@@ -46,9 +45,9 @@ class demo_edge_device(ConnectedDevice):
         super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
 
     def __init__(self, credentials):
-        super().__init__(credentials["company_id"], credentials["unique_id"], credentials["environment"], credentials["sdk_id"], credentials["sdk_options"])
-        self.api_ver = credentials["message_version"]
-        self.attributes = credentials["attributes"]
+        super().__init__(credentials[c.company_id], credentials[c.unique_id], credentials[c.environment], credentials[c.sdk_id], credentials[c.sdk_options])
+        self.api_ver = credentials[c.sdk_ver]
+        self.attributes = credentials[c.attributes]
 
     def connect(self):
         super().connect()
