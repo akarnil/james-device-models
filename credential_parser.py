@@ -57,6 +57,15 @@ class Device:
             available_space:str = "available_space_MB"
             file_count:str = "file_count"
 
+class Attributes:
+    """Human readable Enum for to mapping credential's attributes objects json format, including subclasses"""
+    name:str = "attributes"
+    class Children:
+        name:str = "name"
+        private_data:str = "private_data"
+        data_type:str = "data_type"
+        default_value:str = "default_value"
+
 def get(j: json, key):
     """Get value from key, return None if it doesn't exist"""
     if not isinstance(key,str):
