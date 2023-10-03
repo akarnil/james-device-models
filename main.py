@@ -1,3 +1,4 @@
+"""Module for application launcher providing A/B seamless update functionality"""
 #!/usr/bin/python3
 import os
 import sys
@@ -11,21 +12,16 @@ from app_paths import app_paths
 
 # this sample can perform OTA updates, requirements of the OTA payload
 # OTA payload must be a single file of file extension .tar.gz
-# the updated application .py file  must be called the same as a previous version otherwise it will not load, refer to app_name
-
-# Modify in app_paths.py
-app_name = app_paths["app_name"]
-module_name = app_paths["module_name"]
-main_dir = app_paths["main_dir"]
-primary_app_dir = app_paths["primary_app_dir"]
-secondary_app_dir = app_paths["secondary_app_dir"]
+# the updated application .py file  must be called the same
+#  as a previous version otherwise it will not load, refer to app_name
 
 def run_app(to_run_path: str):
+    """Runs .py application via path, removes from path when exception occurs"""
     try:
         print("Running app on "+ to_run_path)
-        module_path: str = to_run_path.replace(app_name,"")
+        module_path: str = to_run_path.replace(app_paths["app_name"],"")
         sys.path.append(module_path)
-        module = import_module(module_name)
+        module = import_module(app_paths["module_name"])
         reload(module)
         module.main()
     except Exception as ex:
@@ -36,17 +32,17 @@ def run_app(to_run_path: str):
 
 
 if __name__ == "__main__":
-    secondary_exists: bool = False
-    secondary_path: str = main_dir + secondary_app_dir + app_name    
+    SECONDARY_EXISTS: bool = False
+    secondary_path: str = app_paths["main_dir"] + app_paths["secondary_app_dir"] + app_paths["app_name"]
     if os.path.exists(secondary_path):
-        secondary_exists = True
+        SECONDARY_EXISTS = True
 
-    primary_exists: bool = False
-    primary_path: str = main_dir + primary_app_dir + app_name
+    PRIMARY_EXISTS: bool = False
+    primary_path: str = app_paths["main_dir"] + app_paths["primary_app_dir"] + app_paths["app_name"]
     if os.path.exists(primary_path):
-        primary_exists = True
+        PRIMARY_EXISTS = True
 
-    if primary_exists and secondary_exists:
+    if PRIMARY_EXISTS and SECONDARY_EXISTS:
         print("Primary and Secondary exist, running")
         try:
             run_app(primary_path)
@@ -54,14 +50,13 @@ if __name__ == "__main__":
             print("Primary app has failed trying backup")
             run_app(secondary_path)
 
-    elif primary_exists:
+    elif PRIMARY_EXISTS:
         print("Only Primary exists, running")
         run_app(primary_path)
 
-    elif secondary_exists:
+    elif SECONDARY_EXISTS:
         print("Only Secondary exists, running")
         run_app(secondary_path)
-    
+
     else:
         print("No valid application exists to run")
-
