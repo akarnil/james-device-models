@@ -1,6 +1,9 @@
+"""
+    Configurables for application running using main.py, and using ota_handler.py
+    Change application names, directories inside the app_paths dictionary
+"""
 import os
 
-# Stuff to change
 app_paths: dict = {
     "app_name": "telemetry_sample.py",
     "primary_app_dir": "/primary/",
