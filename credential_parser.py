@@ -57,14 +57,14 @@ class Device:
             available_space:str = "available_space_MB"
             file_count:str = "file_count"
 
-class Attributes:
-    """Human readable Enum for to mapping credential's attributes objects json format, including subclasses"""
-    name:str = "attributes"
-    class Children:
-        name:str = "name"
-        private_data:str = "private_data"
-        data_type:str = "data_type"
-        default_value:str = "default_value"
+    class Attributes:
+        """Human readable Enum for to mapping credential's attributes objects json format, including subclasses"""
+        name:str = "attributes"
+        class Children:
+            name:str = "name"
+            private_data:str = "private_data"
+            data_type:str = "data_type"
+            default_value:str = "default_value"
 
 def get(j: json, key):
     """Get value from key, return None if it doesn't exist"""
@@ -78,55 +78,62 @@ def parse_json_for_config(path_to_json) -> dict:
     """Create and return credentials dictionary with values from json"""
     j = get_json_from_file(path_to_json)
 
-    credentials: dict = {}
-    credentials["message_version"] = get(j, Keys.message_version)
-    credentials["company_id"] = get(j, Keys.company_id)
-    credentials["unique_id"] = get(j, Keys.unique_id)
-    credentials["environment"] = get(j, Keys.environment)
-    credentials["sdk_id"] = get(j, Keys.sdk_id)
+    c: dict = {}
+    c["message_version"] = get(j, Keys.message_version)
+    c["company_id"] = get(j, Keys.company_id)
+    c["unique_id"] = get(j, Keys.unique_id)
+    c["environment"] = get(j, Keys.environment)
+    c["sdk_id"] = get(j, Keys.sdk_id)
 
-    sdk_options: dict[str] = {}
-    sdk_options.update(parse_auth(j))
-    sdk_options.update(parse_device(j))
+    c["sdk_options"] = get_sdk_options(j)
+    c["attributes"] = parse_device_attributes(j)
 
-    credentials["sdk_options"] = sdk_options
-    return credentials
+    return c
 
 def get_and_assign(from_json, to_obj , from_key, to_key):
     """Get value from json, and assign to object in format needed for the SDK"""
     if (temp := get(from_json, from_key)) is not None:
         to_obj[to_key] = temp
 
-def parse_device(j: json):
-    """Parse device object from credential json, generate format needed for SDK"""
 
-    device_o = get(j, Keys.device)
+def get_sdk_options(j:json):
+    sdk_options: dict[str] = {}
+    sdk_options.update(parse_auth(j))
+    sdk_options.update(parse_device_offline_storage(j))
+    return sdk_options
 
-
-    temp: dict[str] = {}
-    temp.update(parse_device_offline_storage(device_o))
-
-
-    return temp
 
 def parse_device_offline_storage(j:json):
     '''Parse offline_storage parameters'''
-    temp: dict[str] = {}
+    device_o = get(j, Keys.device)
 
-    child: dict[str] = {}
-    if (offline_storage_o := get(j, Device.OfflineStorage.name)) is not None:
-        child[SdkOptions.OfflineStorage.Children.disabled] = False
-        get_and_assign(offline_storage_o,child, Device.OfflineStorage.Children.available_space, SdkOptions.OfflineStorage.Children.available_space)
-        get_and_assign(offline_storage_o,child, Device.OfflineStorage.Children.file_count, SdkOptions.OfflineStorage.Children.file_count)
+    ret_o: dict[str] = {}
+    child_o: dict[str] = {}
+    if (offline_storage_o := get(device_o, Device.OfflineStorage.name)) is not None:
+        child_o[SdkOptions.OfflineStorage.Children.disabled] = False
+        get_and_assign(offline_storage_o,child_o, Device.OfflineStorage.Children.available_space, SdkOptions.OfflineStorage.Children.available_space)
+        get_and_assign(offline_storage_o,child_o, Device.OfflineStorage.Children.file_count, SdkOptions.OfflineStorage.Children.file_count)
     else:
-        child[SdkOptions.OfflineStorage.Children.disabled] = True
-    temp[SdkOptions.OfflineStorage.name] = child
+        child_o[SdkOptions.OfflineStorage.Children.disabled] = True
+    ret_o[SdkOptions.OfflineStorage.name] = child_o
 
-    return temp
+    return ret_o
 
+def parse_device_attributes(j:json):
+    '''Parse device attributes parameters'''
+    device_o = get(j, Keys.device)
 
+    all_attributes = []
+    if (attributes := get(device_o, Device.Attributes.name)) is not None:
+        for attribute in attributes:
+            a = {}
+            a[Device.Attributes.Children.name] = get(attribute, Device.Attributes.Children.name)
+            a[Device.Attributes.Children.data_type] = get(attribute, Device.Attributes.Children.data_type)
+            a[Device.Attributes.Children.default_value] = get(attribute, Device.Attributes.Children.default_value)
+            a[Device.Attributes.Children.private_data] = get(attribute, Device.Attributes.Children.private_data)
+            all_attributes.append(a)
 
-
+    return all_attributes
 
 def parse_auth(j: json):
     """Parse auth object from credential json, generate format needed for SDK"""
