@@ -77,10 +77,20 @@ class JsonDevice(ConnectedDevice):
         )
 
     def get_state(self):
+        '''Do not override'''
+        data_obj = {}
+        data_obj.update(self.get_attributes_state())
+        data_obj.update(self.get_local_state())
+        return data_obj
+    
+    def get_attributes_state(self) -> dict:
         data_obj = {}
         attr: DynAttr
         for attr in self.attributes:
             setattr(self, attr.name, attr.get_value())
             data_obj[attr.name] = getattr(self, attr.name)
         return data_obj
+    
+    def get_local_state(self) -> dict:
+        raise NotImplementedError()
 

@@ -1,25 +1,20 @@
 from enum import Enum
 import sys
-import requests
 from models.enums import Enums as e
 from models.JsonDevice import JsonDevice
 sys.path.append("iotconnect")
-from iotconnect import IoTConnectSDK as SdkClient
+from models.ota_handler import OtaHandler
+import random
+from datetime import datetime
+from typing import Union # to use Union[Enum, None] type hint
 
 
 def whoami():
     import sys
     return sys._getframe(1).f_code.co_name
 
-from models.ota_handler import OtaHandler
 
-import random
-from datetime import datetime
-from typing import Union # to use Union[Enum, None] type hint
-
-class demo_edge_device(JsonDevice):
-    template = "wkjb220907"
-
+class DemoEdgeDevice(JsonDevice):
     #sensor data
     time1 = "11:55:22"
     bit1 = 1
@@ -35,15 +30,7 @@ class demo_edge_device(JsonDevice):
         ECHO:str = "echo "
         LED:str = "led "
 
-    def __init__(self, path_to_json):
-        super().__init__(path_to_json)
-        pass
-
-    def connect(self):
-        super().connect()
-        pass
-
-    def update(self):
+    def update_local_state(self):
         self.temperature = random.randint(30, 50)
         self.long1 = random.randint(6000, 9000)
         self.integer1 = random.randint(100, 200)
@@ -51,7 +38,7 @@ class demo_edge_device(JsonDevice):
         self.date1 = datetime.utcnow().strftime("%Y-%m-%d")
         self.datetime1 = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-    def get_state(self):
+    def get_local_state(self):
         # returns the current state of device
         data_obj = {
             "temperature": self.temperature,
@@ -67,13 +54,6 @@ class demo_edge_device(JsonDevice):
         return data_obj
 
 
-    def emergency_cb(self, msg, request_id):
-        print("direct method CB on template {}".format(self.template))
-        print(msg)
-        print(request_id)
-        self.direct_message_ack(request_id, {"fire": False})
-
-        
     def ota_cb(self,msg):
         OtaHandler(self,msg)
 
@@ -115,34 +95,3 @@ class demo_edge_device(JsonDevice):
             print(to_print)
             self.send_ack(msg,e.Values.AckStat.SUCCESS, "Command Executed Successfully")
 
-
-    def firmware_command(self, msg):
-        print("firmware\nhw: {}, sw: {}, {} urls".format(msg["ver"]["hw"], msg["ver"]["sw"], len(msg["urls"])))
-        status = 1
-        for url in msg["urls"]:
-            result = requests.get(url["url"])
-            print(result.text)
-        return status
-
-    def twin_update_cb(self, msg):
-        super().twin_update_cb(msg)
-        self.twin = msg["desired"]["twin"]
-        print("self.twin = {}".format(self.twin))
-
-    def for_iotconnect_upload(self):
-        export_dict = super().for_iotconnect_upload()
-        export_dict["properties"] = [
-            {
-                "key": "level",
-                "value": self.level
-            },
-            {
-                "key": "power",
-                "value": self.power
-            }
-        ]
-        return export_dict
-
-
-if __name__ == "__main__":
-    pass
