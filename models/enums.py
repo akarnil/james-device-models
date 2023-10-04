@@ -1,7 +1,11 @@
+'''
+    Converting from iotconnect SDK's dictionary types to a more useful enum
+    Benefit of it is that we can rename the enums to a more verbose and user friendly standard
+'''
 from enum import Enum
 from typing import Union # to use Union[Enum, None] type hint
 
-
+from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION,DATATYPE
 
 class Enums:
 
@@ -24,54 +28,54 @@ class Enums:
             FAILED = 1
             DL_IN_PROGRESS = 2
             DL_DONE = 3
-            DL_FAILED= 4
+            DL_FAILED = 4
 
         class MessageType(Enum):
-            RPT = 0
-            FLT = 1
-            RPTEDGE = 2
-            RMEdge = 3
-            LOG = 4
-            ACK = 5
-            OTA = 6
-            FIRMWARE = 11
+            RPT = MSGTYPE["RPT"]
+            FLT = MSGTYPE["FLT"]
+            RPTEDGE = MSGTYPE["RPTEDGE"]
+            RMEdge = MSGTYPE["RMEdge"]
+            LOG = MSGTYPE["LOG"]
+            ACK = MSGTYPE["ACK"]
+            OTA = MSGTYPE["OTA"]
+            FIRMWARE = MSGTYPE["FIRMWARE"]
 
         class ErrorCode(Enum):
-            OK = 0
-            DEV_NOT_REG = 1
-            AUTO_REG = 2
-            DEV_NOT_FOUND = 3
-            DEV_INACTIVE = 4
-            OBJ_MOVED = 5
-            CPID_NOT_FOUND = 6
+            OK = ErorCode["OK"]
+            DEV_NOT_REG = ErorCode["DEV_NOT_REG"]
+            AUTO_REG = ErorCode["AUTO_REG"]
+            DEV_NOT_FOUND = ErorCode["DEV_NOT_FOUND"]
+            DEV_INACTIVE = ErorCode["DEV_INACTIVE"]
+            OBJ_MOVED = ErorCode["OBJ_MOVED"]
+            CPID_NOT_FOUND = ErorCode["CPID_NOT_FOUND"]
 
         class Commands(Enum):
-            DCOMM = 0
-            FIRMWARE = 1
-            MODULE = 2
-            U_ATTRIBUTE = 101
-            U_SETTING = 102
-            U_RULE = 103
-            U_DEVICE = 104
-            DATA_FRQ = 105
-            U_barred = 106
-            D_Disabled = 107
-            D_Released = 108
-            STOP = 109
-            Start_Hr_beat = 110
-            Stop_Hr_beat = 111
-            is_connect = 116
-            SYNC = "sync"
-            RESETPWD = "resetpwd"
-            UCART = "updatecrt"
+            DCOMM = CMDTYPE["DCOMM"]
+            FIRMWARE = CMDTYPE["FIRMWARE"]
+            MODULE = CMDTYPE["MODULE"]
+            U_ATTRIBUTE = CMDTYPE["U_ATTRIBUTE"]
+            U_SETTING = CMDTYPE["U_SETTING"]
+            U_RULE = CMDTYPE["U_RULE"]
+            U_DEVICE = CMDTYPE["U_DEVICE"]
+            DATA_FRQ = CMDTYPE["DATA_FRQ"]
+            U_barred = CMDTYPE["U_barred"]
+            D_Disabled = CMDTYPE["D_Disabled"]
+            D_Released = CMDTYPE["D_Released"]
+            STOP = CMDTYPE["STOP"]
+            Start_Hr_beat = CMDTYPE["Start_Hr_beat"]
+            Stop_Hr_beat = CMDTYPE["Stop_Hr_beat"]
+            is_connect = CMDTYPE["is_connect"]
+            SYNC = CMDTYPE["SYNC"]
+            RESETPWD = CMDTYPE["RESETPWD"]
+            UCART = CMDTYPE["UCART"]
 
         class Option(Enum):
-            attribute = "att"
-            setting = "set"
-            protocol = "p"
-            device = "d"
-            sdkConfig = "sc"
-            rule = "r"
+            attribute = OPTION["attribute"]
+            setting = OPTION["setting"]
+            protocol = OPTION["protocol"]
+            device = OPTION["device"]
+            sdkConfig = OPTION["sdkConfig"]
+            rule = OPTION["rule"]
 
         class DataType(Enum):
             INT = 1
