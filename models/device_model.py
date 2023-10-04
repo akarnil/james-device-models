@@ -78,13 +78,14 @@ class ConnectedDevice(GenericDevice):
     def connect(self):
         print("message version {}".format(self.api_ver))
         if self.api_ver == 2.1:
-            # def __init__(self, uniqueId, sId, sdkOptions=None, initCallback=None)
             self.SdkClient = IoTConnectSDK(
-                self.unique_id,
-                self.sdk_id,
-                self.SdkOptions,
-                self.init_cb
-            )
+                uniqueId=self.unique_id,
+                sId=self.sdk_id,
+                # cpid=self.company_id,
+                cpid=None, # remove this once they fix the SDK
+                env=self.environment,
+                sdkOptions=self.SdkOptions,
+                initCallback=self.init_cb)
             self.bind_callbacks()
         else:
             # def __init__(self, cpId, uniqueId, listner, listner_twin, sdkOptions=None, env="PROD")

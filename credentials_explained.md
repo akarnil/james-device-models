@@ -42,7 +42,7 @@ Example `.json` that uses offline storage and symmetric key authentication
     Symmetric Key Authentication
     ```json
         "auth": {
-            "type": "symmetric",
+            "auth_type": "symmetric",
             "params": {
                 "primary_key": "XXX"
             }
@@ -52,7 +52,7 @@ Example `.json` that uses offline storage and symmetric key authentication
     X509 Certificate Authentication
     ```json
         "auth": {
-            "type": "x509",
+            "auth_type": "x509",
             "params": {
                 "client_key": "Path to key",
                 "client_cert": "Path to cert",
