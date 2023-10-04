@@ -1,7 +1,7 @@
 #from models.device_model import *
-from device_model import ConnectedDevice
+from models.device_model import ConnectedDevice
 
-from JsonParser import parse_json_for_config, ToSDK
+from models.JsonParser import parse_json_for_config, ToSDK
 
 
 

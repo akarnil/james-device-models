@@ -1,15 +1,11 @@
-import requests
-
-from models.device_model import ConnectedDevice
-
+from enum import Enum
 import sys
+import requests
+from models.enums import Enums as e
+from models.JsonDevice import JsonDevice
 sys.path.append("iotconnect")
 from iotconnect import IoTConnectSDK as SdkClient
 
-import json
-
-from enum import Enum
-from models.enums import Enums as e
 
 def whoami():
     import sys
@@ -20,10 +16,8 @@ from models.ota_handler import OtaHandler
 import random
 from datetime import datetime
 from typing import Union # to use Union[Enum, None] type hint
-from credential_parser import Credentials as c
 
-class demo_edge_device(ConnectedDevice):
-    attributes = []
+class demo_edge_device(JsonDevice):
     template = "wkjb220907"
 
     #sensor data
@@ -41,17 +35,13 @@ class demo_edge_device(ConnectedDevice):
         ECHO:str = "echo "
         LED:str = "led "
 
-    def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
-        super().__init__(company_id, unique_id, environment, sdk_id, sdk_options)
-
-    def __init__(self, credentials):
-        super().__init__(credentials[c.company_id], credentials[c.unique_id], credentials[c.environment], credentials[c.sdk_id], credentials[c.sdk_options])
-        self.api_ver = credentials[c.sdk_ver]
-        self.attributes = credentials[c.attributes]
+    def __init__(self, path_to_json):
+        super().__init__(path_to_json)
+        pass
 
     def connect(self):
         super().connect()
-#        self.SdkClient.regiter_directmethod_callback("emergency", self.emergency_cb)
+        pass
 
     def update(self):
         self.temperature = random.randint(30, 50)
@@ -86,7 +76,6 @@ class demo_edge_device(ConnectedDevice):
         
     def ota_cb(self,msg):
         OtaHandler(self,msg)
-
 
     def device_cb(self,msg):
         print("device callback received")
