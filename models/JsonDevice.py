@@ -20,10 +20,14 @@ class DynAttr:
 
     def get_value(self):
         val = self.default
-        with open(self.path, "r") as f:
-            val = f.read()
+        try:
+            with open(self.path, "r", encoding="utf-8") as f:
+                val = f.read()
+                val = self.convert_type(val)
+        except FileNotFoundError:
+            print("File not found at " + self.path)
+            raise
 
-        self.convert_type(val)
         return val
     
     def convert_type(self, val):
