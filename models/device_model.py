@@ -52,8 +52,8 @@ class GenericDevice:
         }]
         return data_obj
 
-    def get_state(self):
-        return {}
+    def get_state(self) -> dict:
+        raise NotImplementedError()
 
 
 class ConnectedDevice(GenericDevice):
@@ -99,22 +99,22 @@ class ConnectedDevice(GenericDevice):
             )
 
     def ota_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def module_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def twin_change_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def attribute_change_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def device_change_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def rule_change_cb(self,msg):
-        pass
+        raise NotImplementedError()
 
     def init_cb(self, msg):
         if e.get_command_type(msg) is e.Values.Commands.is_connect:
