@@ -1,0 +1,6 @@
+TO DO
+    json file as cli argument
+    yocto demo for just json device
+    get attributes from cloud on ConnectedDevice, when sending data, check against it then convert appropriately
+    fix data type enum from dataevaluation file
+    

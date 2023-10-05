@@ -5,8 +5,6 @@ from iotconnect import IoTConnectSDK
 
 from common.enums import Enums as e
 
-# This device only supports the Azure Cloud platform for the time being
-PLATFORM = "az"
 
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))
@@ -68,12 +66,12 @@ class ConnectedDevice(GenericDevice):
         self.SdkOptions = sdk_options
 
     def connect(self):
+        #def __init__(self, uniqueId, sId,sdkOptions=None,initCallback=None):
         self.SdkClient = IoTConnectSDK(
-            pf=PLATFORM,
             uniqueId=self.unique_id,
             sId=self.sdk_id,
-            cpid=self.company_id,
-            env=self.environment,
+            #cpid=self.company_id,
+            #env=self.environment,
             sdkOptions=self.SdkOptions,
             initCallback=self.init_cb)
         

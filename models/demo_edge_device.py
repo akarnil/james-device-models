@@ -3,9 +3,6 @@ import sys
 from common.enums import Enums as e
 from models.JsonDevice import JsonDevice
 sys.path.append("iotconnect")
-from common.ota_handler import OtaHandler
-import random
-from datetime import datetime
 from typing import Union # to use Union[Enum, None] type hint
 
 
@@ -15,48 +12,10 @@ def whoami():
 
 
 class DemoEdgeDevice(JsonDevice):
-    #dummy local state
-    time1 = "11:55:22"
-    bit1 = 1
-    string1 = "red"
-    temperature = None
-    long1 = None
-    integer1 = None
-    decimal1 = None
-    date1 = None
-    datetime1 = None
-
     class DeviceCommands(Enum):
         ECHO:str = "echo "
         LED:str = "led "
         TEST:str = "test_command"
-
-    def update_local_state(self):
-        self.temperature = random.randint(30, 50)
-        self.long1 = random.randint(6000, 9000)
-        self.integer1 = random.randint(100, 200)
-        self.decimal1 = random.uniform(10.5, 75.5)
-        self.date1 = datetime.utcnow().strftime("%Y-%m-%d")
-        self.datetime1 = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000Z")
-
-    def get_local_state(self):
-        # returns the current state of device
-        data_obj = {
-            "temperature": self.temperature,
-            "long1": self.long1,
-            "integer1": self.integer1,
-            "decimal1": self.decimal1,
-            "date1": self.date1,
-            "time1": self.time1,
-            "bit1": self.bit1,
-            "string1": self.string1,
-            "datetime1": self.datetime1
-        }
-        return data_obj
-
-
-    def ota_cb(self,msg):
-        OtaHandler(self,msg)
 
     def device_cb(self,msg):
         print("device callback received")
