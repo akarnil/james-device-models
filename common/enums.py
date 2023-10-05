@@ -79,17 +79,17 @@ class Enums:
             rule = OPTION["rule"]
 
         class DataType(Enum):
-            INT = 1
-            LONG = 2
-            FLOAT = 3
-            STRING = 4
-            Time = 5
-            Date = 6
-            DateTime = 7
-            BIT = 8
-            Boolean = 9
-            LatLong = 10
-            OBJECT = 11
+            INT = list(DATATYPE.values()).index("INT")
+            LONG = list(DATATYPE.values()).index("LONG")
+            FLOAT = list(DATATYPE.values()).index("FLOAT")
+            STRING = list(DATATYPE.values()).index("STRING")
+            Time = list(DATATYPE.values()).index("Time")
+            Date = list(DATATYPE.values()).index("Date")
+            DateTime = list(DATATYPE.values()).index("DateTime")
+            BIT = list(DATATYPE.values()).index("BIT")
+            Boolean = list(DATATYPE.values()).index("Boolean")
+            LatLong = list(DATATYPE.values()).index("LatLong")
+            OBJECT = list(DATATYPE.values()).index("OBJECT")
 
     @classmethod
     def enums_from_keys(cls, key : Keys) -> Union[Enum, None]:
