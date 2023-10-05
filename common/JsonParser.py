@@ -63,17 +63,22 @@ class FromJSON:
         params: str = "params"
 
         class X509:
-            name:str = "x509"
+            name:str = "IOTC_AT_X509"
             class Children:
                 client_key:str = "client_key"
                 client_cert:str = "client_cert"
                 root_cert:str = "root_cert"
 
         class Symmetric:
-            name:str = "symmetric"
+            name:str = "IOTC_AT_SYMMETRIC_KEY"
             class Children:
                 primary_key:str = "primary_key"
-            
+
+        class Token:
+            name:str = "IOTC_AT_TOKEN"
+
+        class TPM:
+            name:str = "IOTC_AT_TPM"
 
     class Device:
         """Human readable Enum for to mapping credential's device object json format, including subclasses"""
@@ -169,6 +174,7 @@ def parse_auth(j: json):
     params_o = get(auth_o, FromJSON.Auth.params)
 
     auth_type = get(auth_o, FromJSON.Auth.type)
+
     if auth_type == FromJSON.Auth.Symmetric.name:
         get_and_assign(params_o,temp, FromJSON.Auth.Symmetric.Children.primary_key, ToSDK.SdkOptions.symmetric_primary_key)
 
@@ -179,6 +185,11 @@ def parse_auth(j: json):
         get_and_assign(params_o,child, FromJSON.Auth.X509.Children.root_cert, ToSDK.SdkOptions.Certificate.Children.root_cert_path)
         temp[ToSDK.SdkOptions.Certificate.name] = child
 
+    elif auth_type == FromJSON.Auth.Token.name:
+        raise NotImplementedError()
+
+    elif auth_type == FromJSON.Auth.TPM.name:
+        raise NotImplementedError()
 
     return temp
 
