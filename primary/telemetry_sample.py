@@ -12,13 +12,15 @@ def main():
     device = DemoEdgeDevice(CREDENTIALS_PATH)
     device.connect()
 
-    while not device.needs_exit:
-        if not device.in_ota:
-            device.update_local_state()
-            print("sending data")
-            device.send_device_states()
+    while True:
+        if device.needs_exit and not device.in_ota:
+            break
 
-            time.sleep(10)
+        device.update_local_state()
+        print("sending data")
+        device.send_device_states()
+
+        time.sleep(10)
 
 
     print("APP EXIT")
