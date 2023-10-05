@@ -108,6 +108,9 @@ class OtaHandler:
         """Copy primary app folder for backup"""
         src = AP.main_app_dir + AP.primary_app_dir
         dst = AP.main_app_dir + AP.primary_app_backup_folder_name
+
+        if os.path.exists(dst):
+            shutil.rmtree(dst, ignore_errors=True)
         shutil.copytree(src, dst)
 
     @staticmethod
