@@ -94,5 +94,6 @@ class JsonDevice(ConnectedDevice):
     
     def get_local_state(self) -> dict:
         '''Overrideable - return dictionary of local data to send to the cloud'''
-        raise NotImplementedError()
+        print("no class-defined object properties")
+        return {}
 
