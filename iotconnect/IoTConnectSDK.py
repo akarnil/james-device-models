@@ -104,6 +104,7 @@ class IoTConnectSDK:
     _env = None
     _sId =None
     _uniqueId = None
+    pf = None
     _listner_callback = None
     _listner_ota_callback = None
     _listner_device_callback = None
@@ -116,6 +117,7 @@ class IoTConnectSDK:
     _data_json = None
     _client = None
     _is_process_started = False
+    _is_dispose = False
     _base_url = ""
     _thread = None
     _ruleEval = None
@@ -186,8 +188,12 @@ class IoTConnectSDK:
                 base_url = "/api/v2.1/dsdk/sid/" + sId
                 base_url = self._property["discoveryUrl"] + base_url
             else:
-                #base_url = "/api/v2.1/dsdk/cpid/"+ self._cpId +"/env/" + self._env
-                base_url = "/api/v2.1/dsdk/cpid/"+ self._cpId +"/env/" + self._env + "?pf=aws"
+                if self.pf == "az":
+                    base_url = "/api/v2.1/dsdk/cpid/"+ self._cpId +"/env/" + self._env
+                if self.pf == "aws":
+                    base_url = "/api/v2.1/dsdk/cpid/"+ self._cpId +"/env/" + self._env + "?pf=aws"
+                else:
+                    base_url = "/api/v2.1/dsdk/cpid/"+ self._cpId +"/env/" + self._env                        
                 base_url = self._property["discoveryUrl"] + base_url
 
             res = urllib.urlopen(base_url).read().decode("utf-8")
@@ -325,6 +331,7 @@ class IoTConnectSDK:
                         if self._getattribute_callback == None:
                             self._data_json["att"] = msg["att"]
                             for attr in self.attributes:
+                                print(self.attributes)
                                 attr["evaluation"] = data_evaluation(self.isEdge, attr, self.send_edge_data)
                             self._is_process_started = True
                             self._offlineflag=False
@@ -460,6 +467,8 @@ class IoTConnectSDK:
                 if msg["ct"] == CMDTYPE["STOP"]:
                     print(str(CMDTYPE["STOP"])+" STOP command received...")
                     print(msg)
+                    self._dispose=True
+                self._is_dispose=True
                 self._is_process_started=False
                 if self._offlineClient:
                     self._offlineClient.clear_all_files()
@@ -593,6 +602,7 @@ class IoTConnectSDK:
             if isReChecking:
                 print("\nDisConnected...")
                 print("\nTrying to Connect...")
+                #self._is_dispose = True
                 _tProcess = threading.Thread(target = self.reset_process_sync, args = [option])
                 time.sleep(self._time_s)
                 _tProcess.setName("PSYNC")
@@ -1018,6 +1028,7 @@ class IoTConnectSDK:
                     print("\nPublish data sucessfully... %s" % self._time,data,msgType)
             
             if _Online == False:
+              if self._is_dispose == False:
                 if self._offlineClient:
                     if self._offlineClient.Send(data):
                         self.write_debuglog('[INFO_OS02] '+'['+ str(self._sId)+'_'+str(self._uniqueId)+"] Offline data saved: "+self._time,0)
@@ -1383,7 +1394,7 @@ class IoTConnectSDK:
         ts.tv_nsec=0 * 1000000
         librt.clock_settime(CLOCK_REALTIME,ctypes.byref(ts))
 
-    def __init__(self, uniqueId, sId,cpid,env,sdkOptions=None,initCallback=None):
+    def __init__(self, uniqueId, sId,cpid,env,pf,sdkOptions=None,initCallback=None):
         self._lock = threading.Lock()
 
 #        if sys.platform == 'win32':
@@ -1431,6 +1442,7 @@ class IoTConnectSDK:
         self._cpId = cpid
         self._env = env
         self._uniqueId = uniqueId
+        self.pf = pf
         
         
         if "discoveryUrl" in self._property:
