@@ -55,6 +55,7 @@ class GenericDevice:
 
 class ConnectedDevice(GenericDevice):
     needs_exit:bool = False
+    in_ota:bool = False
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)

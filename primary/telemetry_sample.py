@@ -13,11 +13,12 @@ def main():
     device.connect()
 
     while not device.needs_exit:
-        device.update_local_state()
-        print("sending data")
-        device.send_device_states()
+        if not device.in_ota:
+            device.update_local_state()
+            print("sending data")
+            device.send_device_states()
 
-        time.sleep(10)
+            time.sleep(10)
 
 
     print("APP EXIT")

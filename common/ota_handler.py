@@ -24,9 +24,14 @@ class OtaHandler:
 
     def __init__(self, connected_device: ConnectedDevice, msg):
         self.d = connected_device
+        self.d.in_ota = True
         self.ota_perform_update(msg)
 
+    def __del__(self):
+        self.d.in_ota = False
+
     def ota_perform_update(self,msg):
+
         """Perform OTA logic"""
         if e.get_command_type(msg) != e.Values.Commands.FIRMWARE:
             print("fail wrong command type")
