@@ -57,6 +57,8 @@ class ConnectedDevice(GenericDevice):
     needs_exit:bool = False
     in_ota:bool = False
 
+    cloud_attributes: dict = {}
+
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
         self.company_id = company_id
@@ -76,6 +78,16 @@ class ConnectedDevice(GenericDevice):
             initCallback=self.init_cb)
         
         self.bind_callbacks()
+        self.SdkClient.GetAttributes(self.get_attributes)
+
+    def get_attributes(self, msg):
+        msg = msg[0]
+        if 'd' in msg:
+            self.cloud_attributes = msg['d']
+            for attr in self.cloud_attributes:
+                print(attr)
+
+        
 
     def ota_cb(self,msg):
         raise NotImplementedError()
