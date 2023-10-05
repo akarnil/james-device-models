@@ -4,7 +4,8 @@
 import time
 from models.demo_edge_device import DemoEdgeDevice
 
-CREDENTIALS_PATH = "credentials.json"
+# Relative Path is in respect from main.py
+CREDENTIALS_PATH = "./primary/credentials.json"
 
 def main():
     '''Main function'''
