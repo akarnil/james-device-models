@@ -29,6 +29,7 @@ class DemoEdgeDevice(JsonDevice):
     class DeviceCommands(Enum):
         ECHO:str = "echo "
         LED:str = "led "
+        TEST:str = "test_command"
 
     def update_local_state(self):
         self.temperature = random.randint(30, 50)
@@ -79,8 +80,7 @@ class DemoEdgeDevice(JsonDevice):
     def get_device_command(self, full_command:str) -> Union[Enum, None]:
         command_enum = None
         if full_command is not None:
-            for dc in self.DeviceCommands:
-                dc = dc.value
+            for dc in [dc.value for dc in self.DeviceCommands]:
                 if (sliced := full_command[:len(dc)]) == dc:
                     command_enum = self.DeviceCommands(sliced)
                     break
@@ -93,5 +93,8 @@ class DemoEdgeDevice(JsonDevice):
         if command_enum == self.DeviceCommands.ECHO:
             to_print = full_command[len(self.DeviceCommands.ECHO.value):]
             print(to_print)
+            self.send_ack(msg,e.Values.AckStat.SUCCESS, "Command Executed Successfully")
+
+        if command_enum == self.DeviceCommands.TEST:
             self.send_ack(msg,e.Values.AckStat.SUCCESS, "Command Executed Successfully")
 

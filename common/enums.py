@@ -7,13 +7,14 @@ from typing import Union # to use Union[Enum, None] type hint
 
 from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION,DATATYPE
 
+
 class Enums:
 
-    class Keys(str, Enum):
-        ack = 'ack'
-        command_type = 'ct'
-        id = 'id'
-        device_command = 'cmd'
+    class Keys(Enum):
+        ack:str = 'ack'
+        command_type:str = 'ct'
+        id:str = 'id'
+        device_command:str = 'cmd'
 
     class Values:
         # 2.1 enums
@@ -98,7 +99,8 @@ class Enums:
         return None
 
     @classmethod
-    def get_value_using_key(cls,msg, key) -> Union[str, None]:
+    def get_value_using_key(cls,msg, key: Enum) -> Union[str, None]:
+        key = key.value
         if (key in msg):
             return msg[key]
         return None
@@ -113,6 +115,7 @@ class Enums:
         '''
         if (value := cls.get_value_using_key(msg,key)) is not None:
             if (all_enums := cls.enums_from_keys(key)) is not None:
+                a_e: Enum
                 for a_e in all_enums:
                     if value == a_e.value:
                         return a_e
