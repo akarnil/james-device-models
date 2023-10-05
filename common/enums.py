@@ -50,7 +50,7 @@ class Enums:
             CPID_NOT_FOUND = ErorCode["CPID_NOT_FOUND"]
 
         class Commands(Enum):
-            DCOMM = CMDTYPE["DCOMM"]
+            DEVICE_COMMAND = CMDTYPE["DCOMM"]
             FIRMWARE = CMDTYPE["FIRMWARE"]
             MODULE = CMDTYPE["MODULE"]
             U_ATTRIBUTE = CMDTYPE["U_ATTRIBUTE"]
@@ -64,7 +64,7 @@ class Enums:
             STOP = CMDTYPE["STOP"]
             Start_Hr_beat = CMDTYPE["Start_Hr_beat"]
             Stop_Hr_beat = CMDTYPE["Stop_Hr_beat"]
-            is_connect = CMDTYPE["is_connect"]
+            INIT_CONNECT = CMDTYPE["is_connect"]
             SYNC = CMDTYPE["SYNC"]
             RESETPWD = CMDTYPE["RESETPWD"]
             UCART = CMDTYPE["UCART"]

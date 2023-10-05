@@ -1,7 +1,7 @@
 #from models.device_model import *
 from models.device_model import ConnectedDevice
 
-from models.JsonParser import parse_json_for_config, ToSDK
+from common.JsonParser import parse_json_for_config, ToSDK
 
 
 
@@ -84,6 +84,7 @@ class JsonDevice(ConnectedDevice):
         return data_obj
     
     def get_attributes_state(self) -> dict:
+        '''Gets all attributes specified from the JSON file'''
         data_obj = {}
         attr: DynAttr
         for attr in self.attributes:
@@ -92,5 +93,6 @@ class JsonDevice(ConnectedDevice):
         return data_obj
     
     def get_local_state(self) -> dict:
+        '''Overrideable - return dictionary of local data to send to the cloud'''
         raise NotImplementedError()
 

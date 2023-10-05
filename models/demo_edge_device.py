@@ -1,9 +1,9 @@
 from enum import Enum
 import sys
-from models.enums import Enums as e
+from common.enums import Enums as e
 from models.JsonDevice import JsonDevice
 sys.path.append("iotconnect")
-from models.ota_handler import OtaHandler
+from common.ota_handler import OtaHandler
 import random
 from datetime import datetime
 from typing import Union # to use Union[Enum, None] type hint
@@ -15,7 +15,7 @@ def whoami():
 
 
 class DemoEdgeDevice(JsonDevice):
-    #sensor data
+    #dummy local state
     time1 = "11:55:22"
     bit1 = 1
     string1 = "red"
@@ -62,11 +62,11 @@ class DemoEdgeDevice(JsonDevice):
 
         # check command type got from message
         if (command_type := e.get_command_type(msg)) is not None:
-            if command_type == e.Values.Commands.DCOMM:
+            if command_type == e.Values.Commands.DEVICE_COMMAND:
                 # do something cool here
                 self.device_command(msg)
 
-            if command_type == e.Values.Commands.is_connect:
+            if command_type == e.Values.Commands.INIT_CONNECT:
                 print("connection status is " + msg["command"])
 
             else:

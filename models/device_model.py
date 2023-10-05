@@ -9,7 +9,7 @@ sys.path.append("/home/akarnil/Documents/Work/james-device-models/")
 # remove for release
 from iotconnect import IoTConnectSDK
 
-from models.enums import Enums as e
+from common.enums import Enums as e
 
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))
@@ -100,7 +100,7 @@ class ConnectedDevice(GenericDevice):
         raise NotImplementedError()
 
     def init_cb(self, msg):
-        if e.get_command_type(msg) is e.Values.Commands.is_connect:
+        if e.get_command_type(msg) is e.Values.Commands.INIT_CONNECT:
             print("connection status is " + msg["command"])
         
     def bind_callbacks(self):
