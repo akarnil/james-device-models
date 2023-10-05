@@ -14,10 +14,10 @@ class AppPaths:
         AP.main_app_dir = os.path.dirname(__file__)
     """
     app_name = "telemetry_sample.py"
-    primary_app_dir = "/primary/"
-    secondary_app_dir = "/secondary/"
-    tarball_download_dir = "/.temp_ota/"
-    tarball_extract_dir = "/.temp_extracted/"
+    primary_app_dir = "primary/"
+    secondary_app_dir = "secondary/"
+    tarball_download_dir = ".temp_ota/"
+    tarball_extract_dir = ".temp_extracted/"
     main_app_dir = None
     primary_backup_extension = ".backup"
     module_name = app_name.replace(".py","")

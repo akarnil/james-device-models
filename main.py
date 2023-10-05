@@ -6,8 +6,6 @@ from importlib import import_module, reload
 
 
 from common.app_paths import AppPaths as AP
-#Need to set main app directory'''
-AP.main_app_dir = os.path.dirname(__file__)
 
 # this the runner of the demo, used to show A/B updates
 # the actual code lives inside a folder called `primary_app_dir`
@@ -35,6 +33,14 @@ def run_app(to_run_path: str):
 
 
 if __name__ == "__main__":
+
+    #Need to set main app directory'''
+    main_dirname = os.path.dirname(__file__)
+    if main_dirname == "":
+        AP.main_app_dir = "./"
+    else:
+        AP.main_app_dir = main_dirname + "/"
+
     SECONDARY_EXISTS: bool = False
     secondary_path: str = AP.main_app_dir + AP.secondary_app_dir + AP.app_name
     if os.path.exists(secondary_path):
