@@ -1,15 +1,12 @@
 import json
 from datetime import datetime
 
-# only to use a local copy of the SDK remove for release
-import sys
-sys.path.append("iotconnect")
-sys.path.append("/home/akarnil/Documents/Work/james-device-models/")
-
-# remove for release
 from iotconnect import IoTConnectSDK
 
 from common.enums import Enums as e
+
+# This device only supports the Azure Cloud platform for the time being
+PLATFORM = "az"
 
 def print_msg(title, msg):
     print("{}: \n{}".format(title, json.dumps(msg, indent=2)))
@@ -69,13 +66,14 @@ class ConnectedDevice(GenericDevice):
 
     def connect(self):
         self.SdkClient = IoTConnectSDK(
+            pf=PLATFORM,
             uniqueId=self.unique_id,
             sId=self.sdk_id,
-            # cpid=self.company_id,
-            cpid=None, # remove this once they fix the SDK
+            cpid=self.company_id,
             env=self.environment,
             sdkOptions=self.SdkOptions,
             initCallback=self.init_cb)
+        
         self.bind_callbacks()
 
     def ota_cb(self,msg):
