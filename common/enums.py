@@ -5,8 +5,8 @@
 from enum import Enum
 from typing import Union # to use Union[Enum, None] type hint
 
-from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION,DATATYPE
-
+from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION
+from iotconnect.common.data_evaluation import DATATYPE
 
 class Enums:
 
@@ -79,17 +79,17 @@ class Enums:
             rule = OPTION["rule"]
 
         class DataType(Enum):
-            INT = list(DATATYPE.values()).index("INT")
-            LONG = list(DATATYPE.values()).index("LONG")
-            FLOAT = list(DATATYPE.values()).index("FLOAT")
-            STRING = list(DATATYPE.values()).index("STRING")
-            Time = list(DATATYPE.values()).index("Time")
-            Date = list(DATATYPE.values()).index("Date")
-            DateTime = list(DATATYPE.values()).index("DateTime")
-            BIT = list(DATATYPE.values()).index("BIT")
-            Boolean = list(DATATYPE.values()).index("Boolean")
-            LatLong = list(DATATYPE.values()).index("LatLong")
-            OBJECT = list(DATATYPE.values()).index("OBJECT")
+            INT = DATATYPE["INT"]
+            LONG = DATATYPE["LONG"]
+            FLOAT = DATATYPE["FLOAT"]
+            STRING = DATATYPE["STRING"]
+            Time = DATATYPE["Time"]
+            Date = DATATYPE["Date"]
+            DateTime = DATATYPE["DateTime"]
+            BIT = DATATYPE["BIT"]
+            Boolean = DATATYPE["Boolean"]
+            LatLong = DATATYPE["LatLong"]
+            OBJECT = DATATYPE["OBJECT"]
 
     @classmethod
     def enums_from_keys(cls, key : Keys) -> Union[Enum, None]:
