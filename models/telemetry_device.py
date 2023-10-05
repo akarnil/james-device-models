@@ -11,7 +11,7 @@ def whoami():
     return sys._getframe(1).f_code.co_name
 
 
-class DemoEdgeDevice(JsonDevice):
+class TelemetryDevice(JsonDevice):
     class DeviceCommands(Enum):
         ECHO:str = "echo "
         LED:str = "led "
