@@ -54,8 +54,8 @@ class GenericDevice:
 class ConnectedDevice(GenericDevice):
     needs_exit:bool = False
     in_ota:bool = False
-
-    cloud_attributes: dict = {}
+    
+    cloud_attributes: dict = None
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
@@ -66,7 +66,6 @@ class ConnectedDevice(GenericDevice):
         self.SdkOptions = sdk_options
 
     def connect(self):
-        #def __init__(self, uniqueId, sId,sdkOptions=None,initCallback=None):
         self.SdkClient = IoTConnectSDK(
             uniqueId=self.unique_id,
             sId=self.sdk_id,
@@ -76,16 +75,12 @@ class ConnectedDevice(GenericDevice):
             initCallback=self.init_cb)
         
         self.bind_callbacks()
-        self.SdkClient.GetAttributes(self.get_attributes)
+        self.SdkClient.GetAttributes(self.get_cloud_attributes)
 
-    def get_attributes(self, msg):
+    def get_cloud_attributes(self, msg):
         msg = msg[0]
         if 'd' in msg:
             self.cloud_attributes = msg['d']
-            for attr in self.cloud_attributes:
-                print(attr)
-
-        
 
     def ota_cb(self,msg):
         raise NotImplementedError()
@@ -122,6 +117,11 @@ class ConnectedDevice(GenericDevice):
         self.SdkClient.onDeviceCommand(self.device_cb)
 
     def send_device_states(self):
+
+        # Don't send anything till we get our cloud attributes
+        if self.cloud_attributes is None:
+            return
+
         data_array = [self.get_d2c_data()]
         if self.children is not None:
             for child in self.children:

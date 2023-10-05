@@ -22,8 +22,7 @@ class ToSDK:
     class Attributes(Enum):
         name = auto()
         private_data = auto()
-        data_type = auto()
-        default_value = auto()
+        private_data_type = auto()
 
     class SdkOptions:
         """Human readable Enum for to mapping SDK's sdkOptions format"""
@@ -94,8 +93,7 @@ class FromJSON:
             class Children:
                 name:str = "name"
                 private_data:str = "private_data"
-                data_type:str = "data_type"
-                default_value:str = "default_value"
+                private_data_type:str = "private_data_type"
 
 def get(j: json, key):
     """Get value from key, return None if it doesn't exist"""
@@ -159,8 +157,7 @@ def parse_device_attributes(j:json):
         for attribute in attributes:
             a = {}
             a[ToSDK.Attributes.name] = get(attribute, FromJSON.Device.Attributes.Children.name)
-            a[ToSDK.Attributes.data_type] = get(attribute, FromJSON.Device.Attributes.Children.data_type)
-            a[ToSDK.Attributes.default_value] = get(attribute, FromJSON.Device.Attributes.Children.default_value)
+            a[ToSDK.Attributes.private_data_type] = get(attribute, FromJSON.Device.Attributes.Children.private_data_type)
             a[ToSDK.Attributes.private_data] = get(attribute, FromJSON.Device.Attributes.Children.private_data)
             all_attributes.append(a)
 
