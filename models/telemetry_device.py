@@ -30,7 +30,7 @@ class TelemetryDevice(JsonDevice):
                 print("connection status is " + msg["command"])
 
             else:
-                print(whoami() + " got sent command_type     " + command_type)
+                print(whoami() + " got sent command_type     " + int(command_type))
             return
 
         print("callback received not valid")
