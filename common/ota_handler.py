@@ -7,7 +7,7 @@ import shutil
 from urllib.request import urlretrieve
 from models.device_model import ConnectedDevice
 
-from common.enums import Enums as e
+from common.Enums import Enums as E
 from common.app_paths import AppPaths as AP
 
 
@@ -33,7 +33,7 @@ class OtaHandler:
     def ota_perform_update(self,msg):
 
         """Perform OTA logic"""
-        if e.get_value(msg,e.Keys.command_type) != e.Values.Commands.FIRMWARE:
+        if E.get_value(msg,E.Keys.command_type) != E.Values.Commands.FIRMWARE:
             print("fail wrong command type")
             return
 
@@ -54,12 +54,12 @@ class OtaHandler:
             if not os.path.exists(final_folder_dest):
                 os.mkdir(final_folder_dest)
             try:
-                self.d.send_ack(data, e.Values.OtaStat.DL_IN_PROGRESS, "downloading payload")
+                self.d.send_ack(data, E.Values.OtaStat.DL_IN_PROGRESS, "downloading payload")
                 urlretrieve(url, final_folder_dest + download_filename)
             except:
-                self.d.send_ack(data, e.Values.OtaStat.DL_FAILED, "payload dl failed")
+                self.d.send_ack(data, E.Values.OtaStat.DL_FAILED, "payload dl failed")
                 raise
-            self.d.send_ack(data, e.Values.OtaStat.DL_DONE, "payload downloaded")
+            self.d.send_ack(data, E.Values.OtaStat.DL_DONE, "payload downloaded")
 
             self.d.needs_exit  = False
             self.ota_backup_primary()
@@ -68,16 +68,16 @@ class OtaHandler:
                 self.d.needs_exit  = True
             except:
                 self.ota_restore_primary()
-                self.d.send_ack(data, e.Values.OtaStat.FAILED, "OTA FAILED to install")
+                self.d.send_ack(data, E.Values.OtaStat.FAILED, "OTA FAILED to install")
                 self.d.needs_exit  = False
                 raise
 
             if self.d.needs_exit:
                 self.ota_delete_primary_backup()
-                self.d.send_ack(data, e.Values.OtaStat.SUCCESS, "OTA SUCCESS")
+                self.d.send_ack(data, E.Values.OtaStat.SUCCESS, "OTA SUCCESS")
                 return
 
-        self.d.send_ack(data, e.Values.OtaStat.FAILED, "OTA FAILED,invalid payload")
+        self.d.send_ack(data, E.Values.OtaStat.FAILED, "OTA FAILED,invalid payload")
 
     @staticmethod
     def ota_extract_to_a_and_move_old_a_to_b(tarball_name:str):

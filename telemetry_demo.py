@@ -14,7 +14,8 @@ def main(argv):
     device.connect()
 
     while True:
-        device.send_device_states()
+        data_sent = device.send_device_states()
+        print(data_sent)
         time.sleep(10)
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from iotconnect import IoTConnectSDK
 
-from common.enums import Enums as E
+from common.Enums import Enums as E
 
 
 def print_msg(title, msg):

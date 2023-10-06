@@ -1,6 +1,6 @@
 from enum import Enum
 import sys
-from common.enums import Enums as E
+from common.Enums import Enums as E
 from models.JsonDevice import JsonDevice
 sys.path.append("iotconnect")
 from typing import Union # to use Union[Enum, None] type hint

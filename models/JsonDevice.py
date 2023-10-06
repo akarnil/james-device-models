@@ -4,7 +4,7 @@ from models.device_model import ConnectedDevice
 from common.JsonParser import parse_json_for_config, ToSDK
 import struct
 
-from common.enums import Enums as E
+from common.Enums import Enums as E
 
 class DynAttr:
 
