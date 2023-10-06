@@ -9,10 +9,10 @@ from models.telemetry_device import TelemetryDevice
 def main(argv):
     '''Main function'''
     
-    CREDENTIALS_PATH = sys.argv[1:][0]
+    CREDENTIALS_PATH = argv[1:][0]
     device = TelemetryDevice(CREDENTIALS_PATH)
     device.connect()
-    
+
     while True:
         device.send_device_states()
         time.sleep(10)
