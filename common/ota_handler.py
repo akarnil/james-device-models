@@ -33,7 +33,7 @@ class OtaHandler:
     def ota_perform_update(self,msg):
 
         """Perform OTA logic"""
-        if e.get_command_type(msg) != e.Values.Commands.FIRMWARE:
+        if e.get_value(msg,e.Keys.command_type) != e.Values.Commands.FIRMWARE:
             print("fail wrong command type")
             return
 

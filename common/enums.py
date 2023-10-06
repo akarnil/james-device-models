@@ -2,15 +2,12 @@
     Converting from iotconnect SDK's dictionary types to a more useful enum
     Benefit of it is that we can rename the enums to a more verbose and user friendly standard
 '''
-from enum import Enum
-from typing import Union # to use Union[Enum, None] type hint
-
+from typing import Union # to use Union[str, None] type hint
 from iotconnect.IoTConnectSDK import MSGTYPE,ErorCode,CMDTYPE,OPTION
 from iotconnect.common.data_evaluation import DATATYPE
 
 class Enums:
-
-    class Keys(Enum):
+    class Keys:
         ack = 'ack'
         command_type = 'ct'
         id = 'id'
@@ -20,20 +17,20 @@ class Enums:
 
     class Values:
         # 2.1 enums
-        class AckStat(Enum):
+        class AckStat:
             FAIL = 4
             EXECUTED = 5
             SUCCESS = 7
             EXECUTED_ACK = 6 # what is the difference between this and EXECUTED??
             
-        class OtaStat(Enum):
+        class OtaStat:
             SUCCESS = 0
             FAILED = 1
             DL_IN_PROGRESS = 2
             DL_DONE = 3
             DL_FAILED = 4
 
-        class MessageType(Enum):
+        class MessageType:
             RPT = MSGTYPE["RPT"]
             FLT = MSGTYPE["FLT"]
             RPTEDGE = MSGTYPE["RPTEDGE"]
@@ -43,7 +40,7 @@ class Enums:
             OTA = MSGTYPE["OTA"]
             FIRMWARE = MSGTYPE["FIRMWARE"]
 
-        class ErrorCode(Enum):
+        class ErrorCode:
             OK = ErorCode["OK"]
             DEV_NOT_REG = ErorCode["DEV_NOT_REG"]
             AUTO_REG = ErorCode["AUTO_REG"]
@@ -52,7 +49,7 @@ class Enums:
             OBJ_MOVED = ErorCode["OBJ_MOVED"]
             CPID_NOT_FOUND = ErorCode["CPID_NOT_FOUND"]
 
-        class Commands(Enum):
+        class Commands:
             DEVICE_COMMAND = CMDTYPE["DCOMM"]
             FIRMWARE = CMDTYPE["FIRMWARE"]
             MODULE = CMDTYPE["MODULE"]
@@ -72,7 +69,7 @@ class Enums:
             RESETPWD = CMDTYPE["RESETPWD"]
             UCART = CMDTYPE["UCART"]
 
-        class Option(Enum):
+        class Option:
             attribute = OPTION["attribute"]
             setting = OPTION["setting"]
             protocol = OPTION["protocol"]
@@ -80,54 +77,32 @@ class Enums:
             sdkConfig = OPTION["sdkConfig"]
             rule = OPTION["rule"]
 
-        class DataType(Enum):
-            INT = DATATYPE["INT"]
-            LONG = DATATYPE["LONG"]
-            FLOAT = DATATYPE["FLOAT"]
-            STRING = DATATYPE["STRING"]
-            Time = DATATYPE["Time"]
-            Date = DATATYPE["Date"]
-            DateTime = DATATYPE["DateTime"]
-            BIT = DATATYPE["BIT"]
-            Boolean = DATATYPE["Boolean"]
-            LatLong = DATATYPE["LatLong"]
-            OBJECT = DATATYPE["OBJECT"]
+    class MetadataKeys:
+        name = 'ln'
+        data_type = 'dt'
+        default_value = 'dv'
+        sequence = 'sq'
+
+    class ReadTypes:
+        ascii = "ascii"
+        binary = "binary"
+
+    class SendDataTypes:
+        INT = DATATYPE["INT"]
+        LONG = DATATYPE["LONG"]
+        FLOAT = DATATYPE["FLOAT"]
+        STRING = DATATYPE["STRING"]
+        Time = DATATYPE["Time"]
+        Date = DATATYPE["Date"]
+        DateTime = DATATYPE["DateTime"]
+        BIT = DATATYPE["BIT"]
+        Boolean = DATATYPE["Boolean"]
+        LatLong = DATATYPE["LatLong"]
+        OBJECT = DATATYPE["OBJECT"]
+
 
     @classmethod
-    def enums_from_keys(cls, key : Keys) -> Union[Enum, None]:
-        if key == cls.Keys.command_type:
-            return cls.Values.Commands
-        
-        return None
-
-    @classmethod
-    def get_value_using_key(cls,msg, key: Enum) -> Union[str, None]:
-        key = key.value
+    def get_value(cls,msg, key) -> Union[str, None]:
         if (key in msg):
             return msg[key]
         return None
-
-
-    @classmethod
-    def get_enum_using_key(cls, msg, key: Keys) -> Union[Enum, None]:
-        '''
-            Checks if the value got from the message using the key is valid
-            if so then returns the associated Enum object with the value.
-            Returns None if not.
-        '''
-        if (value := cls.get_value_using_key(msg,key)) is not None:
-            if (all_enums := cls.enums_from_keys(key)) is not None:
-                a_e: Enum
-                for a_e in all_enums:
-                    if value == a_e.value:
-                        return a_e
-            print("not valid " + key.name + " does not have associated enum of value " + str(value))
-        return None
-
-    @classmethod
-    def key_in_msg(cls, msg, key: Keys) -> bool:
-        return (key.value in msg)
-    
-    @classmethod
-    def get_command_type(cls, msg) -> Union[Enum, None]:
-        return cls.get_enum_using_key(msg, cls.Keys.command_type) 

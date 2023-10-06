@@ -3,8 +3,7 @@ from datetime import datetime
 
 from iotconnect import IoTConnectSDK
 
-from common.enums import Enums as e
-from enum import Enum
+from common.enums import Enums as E
 
 
 def print_msg(title, msg):
@@ -57,12 +56,6 @@ class ConnectedDevice(GenericDevice):
     in_ota:bool = False
     attribute_metadata: list = None
 
-    class MetadataKeys(str,Enum):
-        name = 'ln'
-        data_type = 'dt'
-        default_value = 'dv'
-        sequence = 'sq'
-
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
         self.company_id = company_id
@@ -86,9 +79,8 @@ class ConnectedDevice(GenericDevice):
     def get_attribute_metadata_from_cloud(self, msg):
         self.attribute_metadata = []
         for meta_dict in msg:
-            key = e.Keys.data.value
-            if key in meta_dict:
-                self.attribute_metadata = meta_dict[key]
+            if E.Keys.data in meta_dict:
+                self.attribute_metadata = meta_dict[E.Keys.data]
 
 
     def ota_cb(self,msg):
@@ -113,7 +105,7 @@ class ConnectedDevice(GenericDevice):
         raise NotImplementedError()
 
     def init_cb(self, msg):
-        if e.get_command_type(msg) is e.Values.Commands.INIT_CONNECT:
+        if E.get_value(msg, E.Keys.command_type) is E.Values.Commands.INIT_CONNECT:
             print("connection status is " + msg["command"])
         
     def bind_callbacks(self):
@@ -147,21 +139,20 @@ class ConnectedDevice(GenericDevice):
             print("no client")
 
     # Either OTA or Standard, exits early if not requested
-    def send_ack(self, msg, status: e.Values.AckStat, message):
-        # check if ack exists in message 
-        key:e.Keys = e.Keys.ack
-        if not e.key_in_msg(msg, key):
+    def send_ack(self, msg, status: E.Values.AckStat, message):
+        # check if ack exists in message
+        if E.get_value(msg, E.Keys.ack) is None:
             print(" Ack not requested, returning")
             return
         
-        id_to_send = e.get_value_using_key(msg, e.Keys.id)
+        id_to_send = E.get_value(msg, E.Keys.id)
 
-        if status.__class__ == e.Values.AckStat:
-            self.SdkClient.sendAckCmd(msg[key.value], status.value, message, id_to_send)
+        if status.__class__ == E.Values.AckStat:
+            self.SdkClient.sendAckCmd(msg[E.Keys.ack], status, message, id_to_send)
             return
         
-        if status.__class__ == e.Values.OtaStat:
-            self.SdkClient.sendOTAAckCmd(msg[key.value], status.value, message, id_to_send)
+        if status.__class__ == E.Values.OtaStat:
+            self.SdkClient.sendOTAAckCmd(msg[E.Keys.ack], status, message, id_to_send)
             return
 
 class Gateway(ConnectedDevice):
