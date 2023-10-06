@@ -11,10 +11,12 @@ from iotconnect.common.data_evaluation import DATATYPE
 class Enums:
 
     class Keys(Enum):
-        ack:str = 'ack'
-        command_type:str = 'ct'
-        id:str = 'id'
-        device_command:str = 'cmd'
+        ack = 'ack'
+        command_type = 'ct'
+        id = 'id'
+        device_command = 'cmd'
+        data = 'd'
+        data_type = 'dt'
 
     class Values:
         # 2.1 enums

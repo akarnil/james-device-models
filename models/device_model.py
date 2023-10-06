@@ -4,6 +4,7 @@ from datetime import datetime
 from iotconnect import IoTConnectSDK
 
 from common.enums import Enums as e
+from enum import Enum
 
 
 def print_msg(title, msg):
@@ -54,8 +55,13 @@ class GenericDevice:
 class ConnectedDevice(GenericDevice):
     needs_exit:bool = False
     in_ota:bool = False
-    
-    cloud_attributes: dict = None
+    attribute_metadata: list = None
+
+    class MetadataKeys(str,Enum):
+        name = 'ln'
+        data_type = 'dt'
+        default_value = 'dv'
+        sequence = 'sq'
 
     def __init__(self, company_id, unique_id, environment, sdk_id, sdk_options=None):
         super().__init__(unique_id)
@@ -75,12 +81,15 @@ class ConnectedDevice(GenericDevice):
             initCallback=self.init_cb)
         
         self.bind_callbacks()
-        self.SdkClient.GetAttributes(self.get_cloud_attributes)
+        self.SdkClient.GetAttributes(self.get_attribute_metadata_from_cloud)
 
-    def get_cloud_attributes(self, msg):
-        msg = msg[0]
-        if 'd' in msg:
-            self.cloud_attributes = msg['d']
+    def get_attribute_metadata_from_cloud(self, msg):
+        self.attribute_metadata = []
+        for meta_dict in msg:
+            key = e.Keys.data.value
+            if key in meta_dict:
+                self.attribute_metadata = meta_dict[key]
+
 
     def ota_cb(self,msg):
         raise NotImplementedError()
@@ -119,7 +128,7 @@ class ConnectedDevice(GenericDevice):
     def send_device_states(self):
 
         # Don't send anything till we get our cloud attributes
-        if self.cloud_attributes is None:
+        if self.attribute_metadata is None:
             return
 
         data_array = [self.get_d2c_data()]
